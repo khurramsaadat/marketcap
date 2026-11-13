@@ -160,11 +160,11 @@ curl "localhost:4310/api/search?q=apple"
 
 ## Known deviations / decisions
 
-1. Prices are polled every 60s; no websocket/streaming feed (per the brief).
+1. Prices are polled every 30s with a 20s server-side cache; no websocket/streaming feed (per the brief).
 2. Portfolio and watchlist persist in `localStorage` until Supabase auth lands — they are not yet
    per-user or cross-device.
-3. Finnhub's free plan blocks `/stock/candle`, so the stock page shows a “not included in the free
-   plan” notice instead of a price chart. No synthetic series is drawn.
+3. Finnhub's free plan blocks `/stock/candle`, so candles come from Yahoo Finance's public chart
+   endpoint (keyless, cached 45s). Nothing synthetic is drawn; if Yahoo fails the panel says so.
 4. `cacheComponents` in Next 16 rejects `dynamic`/`dynamicParams` route configs and client hooks
    outside Suspense, so the stock route reads `params` inside a `<Suspense>` boundary and passes the
    ticker to a client component.

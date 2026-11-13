@@ -55,7 +55,7 @@ Legend: ✅ done · 🟡 partial · ⬜ not started
 | F8 | Per-stock news | Headlines for the selected ticker from Finnhub company-news | 🟡 API ready, stock page still renders catalogue news |
 | F9 | General market news | Market feed on the dashboard | 🟡 API ready, dashboard not wired |
 | F10 | Top movers | Gainers/losers section on the home page | ⬜ |
-| F11 | Stock detail page | Live price, day range, previous close, market cap, P/E, beta, dividend yield, 52-week range, company profile and real headlines; add to watchlist/portfolio | ✅ chart shows a plan notice when candles are blocked |
+| F11 | Stock detail page | Live price, day range, previous close, market cap, P/E, beta, dividend yield, 52-week range, company profile and real headlines; add to watchlist/portfolio | ✅ with a real 1D/5D/1M candlestick chart (Yahoo Finance) |
 | F12 | Search | Ticker/company search from the header | 🟡 `/api/search` ready, no UI |
 | F13 | Auth (email/password) | Sign up, sign in, sign out, session-aware header | ⬜ |
 | F14 | Auth (Google) | OAuth sign-in through Supabase | ⬜ |
@@ -165,8 +165,9 @@ All responses are `cache-control: no-store`; missing key returns an empty result
 2. **Google OAuth** requires redirect URLs registered for both localhost and the deployed origin.
 3. **Top movers** needs a symbol universe; Finnhub's free tier has no screener, so this will use a
    fixed watch universe unless a different endpoint is available.
-4. **Intraday candles** are plan-restricted on Finnhub's free tier, so the stock page shows a notice
-   instead of a chart. A paid plan or a different provider is required to plot price history.
+4. **Intraday candles** are plan-restricted on Finnhub's free tier, so `/api/candles` reads Yahoo
+   Finance's public chart endpoint instead (personal use only, cached 45s). A commercial deployment
+   still needs a licensed feed or the TradingView widget.
 
 ## 12. Data provenance
 

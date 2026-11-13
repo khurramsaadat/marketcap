@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { CandleChart, type Candle } from "@/components/candle-chart";
 import { ChangeArrow, StockLogo } from "@/components/icons";
-import { LineChart } from "@/components/line-chart";
 import { StockActions } from "@/components/stock-actions";
 import { formatCurrency, formatPercent } from "@/lib/dashboard-data";
 import { UpdatedAgo } from "@/components/updated-ago";
@@ -34,11 +34,21 @@ type NewsItem = {
   datetime: number | null;
 };
 
+type CandleRange = "1d" | "5d" | "1mo";
+
+const CANDLE_RANGES: { key: CandleRange; label: string }[] = [
+  { key: "1d", label: "1D" },
+  { key: "5d", label: "5D" },
+  { key: "1mo", label: "1M" },
+];
+
 type CandleState = {
   available: boolean;
   reason?: string;
-  closes?: number[];
-  timestamps?: number[];
+  candles?: Candle[];
+  interval?: string;
+  timeZone?: string;
+  source?: string;
 };
 
 function Stat({ label, value }: { label: string; value: string }) {
@@ -59,7 +69,8 @@ export function StockDetail({ ticker: rawTicker }: { ticker: string }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [profileMissing, setProfileMissing] = useState(false);
   const [news, setNews] = useState<NewsItem[]>([]);
-  const [candles, setCandles] = useState<CandleState | null>(null);
+  const [range, setRange] = useState<CandleRange>("1d");
+  const [charts, setCharts] = useState<Record<string, CandleState>>({});
 
   useEffect(() => {
     let active = true;
@@ -84,19 +95,35 @@ export function StockDetail({ ticker: rawTicker }: { ticker: string }) {
         // empty list is shown when Finnhub has no headlines
       });
 
-    fetch(`/api/candles?symbol=${encodeURIComponent(ticker)}`)
+    return () => {
+      active = false;
+    };
+  }, [ticker]);
+
+  const chartKey = `${ticker}:${range}`;
+  const candles = charts[chartKey] ?? null;
+
+  useEffect(() => {
+    let active = true;
+
+    fetch(`/api/candles?symbol=${encodeURIComponent(ticker)}&range=${range}`)
       .then((response) => response.json())
       .then((data: CandleState) => {
-        if (active) setCandles(data);
+        if (active) setCharts((current) => ({ ...current, [chartKey]: data }));
       })
       .catch(() => {
-        if (active) setCandles({ available: false, reason: "network-error" });
+        if (active) {
+          setCharts((current) => ({
+            ...current,
+            [chartKey]: { available: false, reason: "network-error" },
+          }));
+        }
       });
 
     return () => {
       active = false;
     };
-  }, [ticker]);
+  }, [ticker, range, chartKey]);
 
   if (profileMissing && !quote) {
     return (
@@ -183,29 +210,40 @@ export function StockDetail({ ticker: rawTicker }: { ticker: string }) {
       <section className="mt-5 rounded-2xl border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
         <div className="flex items-center justify-between">
           <h2 className="text-[16px] font-semibold text-ink">Price history</h2>
-          <span className="rounded-full bg-surface-muted px-3 py-1 text-[11.5px] font-medium text-muted">
-            5 min candles
-          </span>
+          <div
+            role="group"
+            aria-label="Chart range"
+            className="flex items-center gap-1 rounded-full bg-surface-muted p-1"
+          >
+            {CANDLE_RANGES.map(({ key, label }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setRange(key)}
+                aria-pressed={range === key}
+                className={`rounded-full px-3 py-1 text-[11.5px] font-medium transition-colors ${
+                  range === key
+                    ? "bg-surface text-ink shadow-sm"
+                    : "text-muted hover:text-ink-soft"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {candles?.available && candles.closes?.length ? (
+        {candles?.available && candles.candles?.length ? (
           <div className="mt-4">
-            <LineChart
-              id={`${ticker}-price`}
-              values={candles.closes}
-              labels={(candles.timestamps ?? []).map((t) =>
-                new Date(t * 1000).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                }),
-              )}
-              labelEvery={Math.max(1, Math.ceil(candles.closes.length / 6))}
-              min={Math.min(...candles.closes) * 0.998}
-              max={Math.max(...candles.closes) * 1.002}
-              tickFormat={(value) => `$${value.toFixed(0)}`}
-              stroke={up ? "#4fd1a5" : "#f7a2b6"}
-              fillTop={up ? "#8ce8c4" : "#f7a8bb"}
+            <CandleChart
+              candles={candles.candles}
+              range={range}
+              timeZone={candles.timeZone}
             />
+            <p className="mt-2 text-[11px] text-faint">
+              {candles.interval} candles from Yahoo Finance · exchange time · may
+              be delayed
+            </p>
           </div>
         ) : (
           <div className="mt-4 flex h-[180px] flex-col items-center justify-center rounded-xl border border-dashed border-line px-6 text-center">
@@ -214,9 +252,9 @@ export function StockDetail({ ticker: rawTicker }: { ticker: string }) {
             </p>
             {candles && !candles.available ? (
               <p className="mt-1 max-w-[420px] text-[12px] leading-relaxed text-muted">
-                {candles.reason === "plan"
-                  ? "Finnhub's candle endpoint is not included in the free plan, so no chart is drawn rather than showing invented prices."
-                  : "Finnhub did not return candles for this symbol. The market may be closed or the symbol unsupported."}
+                {candles.reason === "throttled"
+                  ? "Yahoo Finance rate-limited the request. The chart will fill in on the next try."
+                  : "No intraday candles came back for this symbol. The market may be closed or the symbol unsupported."}
               </p>
             ) : null}
           </div>

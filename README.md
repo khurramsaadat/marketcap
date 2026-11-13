@@ -9,8 +9,10 @@ MarketCap does **not** ship invented market data.
 
 - Prices, changes, company profiles, metrics and news are fetched live from Finnhub through
   server-side API routes; the API key never reaches the browser.
-- Anything the free plan cannot provide (intraday candles, top movers, volume) is shown as a clear
-  notice or omitted — never faked.
+- Intraday candlestick charts (1D / 5D / 1M) come from Yahoo Finance's public chart endpoint, because
+  Finnhub's free plan blocks `/stock/candle`. No key or signup is needed; results are cached for 45s.
+- Anything the free plan cannot provide (top movers, volume) is shown as a clear notice or omitted —
+  never faked.
 - Portfolio and watchlist entries are your own input, stored in this browser until Supabase auth
   is connected.
 
@@ -62,12 +64,12 @@ npm start       # serve the production build
 | `/` | Dashboard: live market watch cards, portfolio value, recorded statistics chart, positions table |
 | `/watchlist` | Followed tickers with live prices |
 | `/portfolio` | Positions with quantity, cost basis, purchase date, target price, computed gain/loss |
-| `/stocks/[ticker]` | Live quote, company profile/metrics, news; candle chart shows a notice when the plan blocks it |
+| `/stocks/[ticker]` | Live quote, company profile/metrics, news and an intraday candlestick chart (1D/5D/1M, Yahoo Finance) |
 | `/api/quotes` | Batched Finnhub quotes (`?tickers=AAPL,MSFT`) |
 | `/api/profile` | Finnhub profile + key metrics (`?symbol=AAPL`) |
 | `/api/news` | Company news (`?symbol=AAPL`) or market news (no symbol) |
 | `/api/search` | Finnhub symbol search (`?q=apple`) |
-| `/api/candles` | Intraday candles; reports `available: false` when the plan blocks them |
+| `/api/candles` | Intraday OHLC candles from Yahoo Finance (`1d`/`5d`/`1mo`), cached 45s per symbol and range |
 
 Quotes are polled every 30 seconds on the dashboard, watchlist, portfolio and stock pages.
 Each ticker is cached for 20 seconds server-side, so several tabs or visitors polling at once

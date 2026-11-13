@@ -19,6 +19,7 @@ Last reviewed: 2026-11-13 · Provider: Finnhub (free tier) · Key: `FINNHUB_API_
 | Per-stock headlines | `GET /company-news` | Stock page News panel (links open the publisher) |
 | Search suggestions (API) | `GET /search` | `/api/search` (UI not wired yet) |
 | General market news (API) | `GET /news?category=general` | `/api/news` without `symbol` (dashboard card not wired yet) |
+| Intraday OHLC candles | **Yahoo Finance** chart endpoint (no key), not Finnhub | Stock page price history: 1D = 5m bars, 5D = 15m, 1M = 60m |
 
 The browser never calls Finnhub directly. All five routes proxy the provider with the key held in
 `process.env.FINNHUB_API_KEY`.
@@ -50,7 +51,7 @@ The browser never calls Finnhub directly. All five routes proxy the provider wit
 
 | Data | Why | What the UI does |
 |------|-----|------------------|
-| Intraday price candles (`/stock/candle`) | Finnhub returns **403 / plan-restricted** for free keys — confirmed by `/api/candles` returning `{ "available": false, "reason": "plan" }` | Stock page shows "Finnhub's candle endpoint is not included in the free plan, so no chart is drawn rather than showing invented prices" |
+| ~~Intraday price candles from Finnhub~~ | Finnhub returns **403 / plan-restricted** for free keys | Replaced: `/api/candles` now reads Yahoo Finance's public chart endpoint, so the stock page draws a real 1D/5D/1M candlestick chart instead of a notice |
 | Top movers / screener | No screener endpoint on the free plan | Feature not built yet (tracked in `Plan.md` stage 8) |
 | Trading volume | Not exposed by `/quote` on this plan | Removed from the holdings table; the column now shows **Quantity** from your own position |
 | Extended fundamentals (revenue, EPS history, etc.) | Paid metrics | Not shown at all |
@@ -85,7 +86,7 @@ npm run dev -- -p 4310
 curl "localhost:4310/api/quotes?tickers=AAPL,MSFT"    # live price + change
 curl "localhost:4310/api/profile?symbol=AAPL"         # live profile + metrics
 curl "localhost:4310/api/news?symbol=AAPL"            # live headlines
-curl "localhost:4310/api/candles?symbol=AAPL"         # {"available":false,"reason":"plan"}
+curl "localhost:4310/api/candles?symbol=AAPL&range=1d"  # live 5m OHLC bars (Yahoo)
 ```
 
 If `FINNHUB_API_KEY` is missing, every route returns `source: "unconfigured"`, quotes come back
