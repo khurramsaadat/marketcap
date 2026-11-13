@@ -157,7 +157,9 @@ waits until every position is priced, so partial totals never pollute the chart.
 
 - Tokens live in `app/globals.css`: `:root` for light, `.dark` for dark —
   `--ink, --ink-soft, --muted, --faint, --line, --canvas, --surface, --surface-muted, --accent,
-  --accent-strong, --accent-soft, --accent-ink, --up, --up-soft, --down, --down-soft, --on-accent`.
+  --accent-strong, --accent-soft, --accent-ink, --up, --up-soft, --down, --down-soft, --on-accent`,
+  plus the categorical `--tone-1…--tone-6` used for news sources and company attributes
+  (`lib/tone.ts` maps a source name to a stable tone).
 - Tailwind consumes them through `@theme inline` (`--color-surface: var(--surface)`), so utilities
   like `bg-surface`, `text-muted`, `border-line` flip automatically.
 - **Never hardcode a hex colour in a component** — add a token in both `:root` and `.dark` instead.

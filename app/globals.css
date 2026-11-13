@@ -20,6 +20,12 @@
   --down: #d92d20;
   --down-soft: #fdecec;
   --on-accent: #ffffff;
+  --tone-1: #6c3bf4;
+  --tone-2: #0f766e;
+  --tone-3: #b45309;
+  --tone-4: #be123c;
+  --tone-5: #1d4ed8;
+  --tone-6: #4d7c0f;
   --glow-a: rgba(140, 122, 255, 0.16);
   --glow-b: rgba(255, 170, 190, 0.12);
   color-scheme: light;
@@ -43,6 +49,12 @@
   --down: #fca5a5;
   --down-soft: #2d1517;
   --on-accent: #140f26;
+  --tone-1: #a78bfa;
+  --tone-2: #5eead4;
+  --tone-3: #fbbf24;
+  --tone-4: #fb7185;
+  --tone-5: #93c5fd;
+  --tone-6: #bef264;
   --glow-a: rgba(124, 92, 246, 0.22);
   --glow-b: rgba(244, 114, 182, 0.1);
   color-scheme: dark;
@@ -66,6 +78,12 @@
   --color-down: var(--down);
   --color-down-soft: var(--down-soft);
   --color-on-accent: var(--on-accent);
+  --color-tone-1: var(--tone-1);
+  --color-tone-2: var(--tone-2);
+  --color-tone-3: var(--tone-3);
+  --color-tone-4: var(--tone-4);
+  --color-tone-5: var(--tone-5);
+  --color-tone-6: var(--tone-6);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

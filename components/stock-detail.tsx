@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CandleChart, type Candle } from "@/components/candle-chart";
+import { toneFor } from "@/lib/tone";
 import { ChangeArrow, StockLogo } from "@/components/icons";
 import { StockActions } from "@/components/stock-actions";
 import { formatCurrency, formatPercent } from "@/lib/dashboard-data";
@@ -262,34 +263,46 @@ export function StockDetail({ ticker: rawTicker }: { ticker: string }) {
       </section>
 
       <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-        <section className="rounded-2xl border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
-          <h2 className="text-[16px] font-semibold text-ink">News</h2>
+        <section className="rounded-2xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+          <h2 className="text-[14px] font-semibold tracking-tight text-ink">News</h2>
           {news.length === 0 ? (
-            <p className="mt-4 text-[13px] text-muted">
+            <p className="mt-3 text-[12px] text-muted">
               No recent headlines for {ticker} from Finnhub.
             </p>
           ) : (
-            <div className="mt-4 divide-y divide-line">
+            <div className="mt-3 divide-y divide-line">
               {news.slice(0, 6).map((item) => (
-                <article key={item.url} className="py-4 first:pt-0 last:pb-0">
+                <article key={item.url} className="py-3 first:pt-0 last:pb-0">
                   <a
                     href={item.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-[14px] font-medium leading-snug text-ink hover:text-accent"
+                    className="text-[12.5px] font-medium leading-[1.45] text-ink transition-colors hover:text-accent"
                   >
                     {item.title}
                   </a>
                   {item.summary ? (
-                    <p className="mt-1.5 line-clamp-2 text-[12.5px] leading-relaxed text-muted">
+                    <p className="mt-1 line-clamp-2 text-[11px] leading-[1.5] text-muted">
                       {item.summary}
                     </p>
                   ) : null}
-                  <p className="mt-2 text-[11.5px] text-faint">
-                    {item.source}
-                    {item.datetime
-                      ? ` · ${new Date(item.datetime * 1000).toLocaleDateString()}`
-                      : ""}
+                  <p className="mt-1.5 flex items-center gap-1.5 text-[10.5px] leading-none text-faint">
+                    <span
+                      aria-hidden="true"
+                      className="size-1.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: toneFor(item.source) }}
+                    />
+                    <span
+                      className="font-medium"
+                      style={{ color: toneFor(item.source) }}
+                    >
+                      {item.source}
+                    </span>
+                    {item.datetime ? (
+                      <span className="text-faint">
+                        · {new Date(item.datetime * 1000).toLocaleDateString()}
+                      </span>
+                    ) : null}
                   </p>
                 </article>
               ))}
@@ -297,30 +310,46 @@ export function StockDetail({ ticker: rawTicker }: { ticker: string }) {
           )}
         </section>
 
-        <section className="rounded-2xl border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
-          <h2 className="text-[16px] font-semibold text-ink">Company</h2>
-          <dl className="mt-4 space-y-3">
-            <div className="flex items-center justify-between gap-4 text-[13px]">
-              <dt className="text-muted">Industry</dt>
-              <dd className="text-right font-medium text-ink">{profile?.industry ?? "—"}</dd>
-            </div>
-            <div className="flex items-center justify-between gap-4 text-[13px]">
-              <dt className="text-muted">Exchange</dt>
-              <dd className="text-right font-medium text-ink">{profile?.exchange ?? "—"}</dd>
-            </div>
-            <div className="flex items-center justify-between gap-4 text-[13px]">
-              <dt className="text-muted">Country</dt>
-              <dd className="text-right font-medium text-ink">{profile?.country ?? "—"}</dd>
-            </div>
-            <div className="flex items-center justify-between gap-4 text-[13px]">
-              <dt className="text-muted">Currency</dt>
-              <dd className="text-right font-medium text-ink">{profile?.currency ?? "—"}</dd>
-            </div>
-            <div className="flex items-start justify-between gap-4 text-[13px]">
-              <dt className="text-muted">Website</dt>
-              <dd className="text-right font-medium text-accent">
+        <section className="rounded-2xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+          <h2 className="text-[14px] font-semibold tracking-tight text-ink">Company</h2>
+          <dl className="mt-3 space-y-2.5">
+            {[
+              { label: "Industry", value: profile?.industry ?? "—", tone: "var(--tone-1)" },
+              { label: "Exchange", value: profile?.exchange ?? "—", tone: "var(--tone-2)" },
+              { label: "Country", value: profile?.country ?? "—", tone: "var(--tone-3)" },
+              { label: "Currency", value: profile?.currency ?? "—", tone: "var(--tone-4)" },
+            ].map((row) => (
+              <div key={row.label} className="flex items-center justify-between gap-4">
+                <dt className="flex items-center gap-2 text-[11.5px] text-muted">
+                  <span
+                    aria-hidden="true"
+                    className="size-1.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: row.tone }}
+                  />
+                  {row.label}
+                </dt>
+                <dd className="text-right text-[11.5px] font-medium text-ink">
+                  {row.value}
+                </dd>
+              </div>
+            ))}
+            <div className="flex items-start justify-between gap-4">
+              <dt className="flex items-center gap-2 text-[11.5px] text-muted">
+                <span
+                  aria-hidden="true"
+                  className="size-1.5 shrink-0 rounded-full"
+                  style={{ backgroundColor: "var(--tone-5)" }}
+                />
+                Website
+              </dt>
+              <dd className="text-right text-[11.5px] font-medium text-accent">
                 {profile?.website ? (
-                  <a href={profile.website} target="_blank" rel="noreferrer">
+                  <a
+                    href={profile.website}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:underline"
+                  >
                     {profile.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
                   </a>
                 ) : (

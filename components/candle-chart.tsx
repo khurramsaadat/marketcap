@@ -65,7 +65,16 @@ export function CandleChart({
 
   const last = candles[candles.length - 1];
   const lastUp = last.c >= last.o;
+  const lastY = y(last.c);
   const active = hover === null ? null : candles[hover];
+
+  // One label per distinct date — a 5D series repeats the same day across bars.
+  const timeTicks: { index: number; text: string }[] = [];
+  for (let index = 0; index < candles.length; index += labelEvery) {
+    const text = timeLabel(candles[index].t, range, timeZone);
+    if (text === timeTicks[timeTicks.length - 1]?.text) continue;
+    timeTicks.push({ index, text });
+  }
 
   const move = (event: MouseEvent<SVGSVGElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -101,14 +110,17 @@ export function CandleChart({
             strokeWidth={1}
             strokeDasharray="4 6"
           />
-          <text
-            x={W - PAD.right + 8}
-            y={y(tick) + 4}
-            fill="var(--muted)"
-            fontSize={11}
-          >
-            {money(tick)}
-          </text>
+          {/* The last-price pill already labels this level. */}
+          {Math.abs(y(tick) - lastY) > 18 ? (
+            <text
+              x={W - PAD.right + 8}
+              y={y(tick) + 4}
+              fill="var(--muted)"
+              fontSize={10.5}
+            >
+              {money(tick)}
+            </text>
+          ) : null}
         </g>
       ))}
 
@@ -141,26 +153,24 @@ export function CandleChart({
         );
       })}
 
-      {candles.map((candle, index) =>
-        index % labelEvery === 0 ? (
-          <text
-            key={`label-${candle.t}`}
-            x={Math.min(Math.max(x(index), PAD.left + 22), PAD.left + PLOT_W - 22)}
-            y={H - 6}
-            fill="var(--faint)"
-            fontSize={11}
-            textAnchor="middle"
-          >
-            {timeLabel(candle.t, range, timeZone)}
-          </text>
-        ) : null,
-      )}
+      {timeTicks.map((tick) => (
+        <text
+          key={`label-${candles[tick.index].t}`}
+          x={Math.min(Math.max(x(tick.index), PAD.left + 22), PAD.left + PLOT_W - 22)}
+          y={H - 6}
+          fill="var(--faint)"
+          fontSize={10.5}
+          textAnchor="middle"
+        >
+          {tick.text}
+        </text>
+      ))}
 
       <line
         x1={PAD.left}
         x2={PAD.left + PLOT_W}
-        y1={y(last.c)}
-        y2={y(last.c)}
+        y1={lastY}
+        y2={lastY}
         stroke={lastUp ? "var(--up)" : "var(--down)"}
         strokeWidth={1}
         strokeDasharray="2 4"
@@ -168,7 +178,7 @@ export function CandleChart({
       />
       <rect
         x={W - PAD.right + 2}
-        y={y(last.c) - 9}
+        y={lastY - 9}
         width={PAD.right - 6}
         height={18}
         rx={4}
@@ -176,9 +186,9 @@ export function CandleChart({
       />
       <text
         x={W - PAD.right + 6}
-        y={y(last.c) + 4}
+        y={lastY + 4}
         fill={lastUp ? "var(--up)" : "var(--down)"}
-        fontSize={11}
+        fontSize={10.5}
         fontWeight={600}
       >
         {last.c.toFixed(2)}
