@@ -12,10 +12,11 @@ MarketCap is a stock investment dashboard: search quotes, follow a watchlist, tr
 against cost basis and target prices, and read market news — modelled on Google Finance and the
 `ref.jpg` dashboard design.
 
-**Current state:** a working Next.js app with a routed shell, four pages, live Finnhub quotes,
-company profiles, metrics and news polled every 30 seconds, and browser-local portfolio/watchlist
-storage. Authentication, per-user database rows and hosting are not wired yet. No invented market
-data is displayed anywhere — see `DATA.md`.
+**Current state:** a working Next.js app deployed on Netlify with a routed shell, four pages, live
+Finnhub quotes, company profiles, metrics and news polled every 30 seconds, Yahoo-sourced intraday
+candles, a dark theme by default, and browser-local portfolio/watchlist storage. Authentication and
+per-user database rows are still outstanding. No invented market data is displayed anywhere — see
+`DATA.md`.
 
 ## 2. Goals
 
@@ -24,7 +25,7 @@ data is displayed anywhere — see `DATA.md`.
    target-hit status at a glance.
 3. Follow stocks in a watchlist and read per-stock plus general market news.
 4. Keep every user's watchlist and portfolio private — enforced in the database, not just the UI.
-5. Ship on Freebuff Sites with the Finnhub key held server-side.
+5. Ship publicly (Netlify) with the Finnhub key held server-side.
 
 ## 3. Non-goals
 
@@ -48,7 +49,7 @@ Legend: ✅ done · 🟡 partial · ⬜ not started
 | F1 | Dashboard matches the reference design | Sidebar, four holding cards, Portfolio Values + Statistics row, My Stock table, light lavender-washed surface | ✅ |
 | F2 | Routed app shell | Sidebar links to `/`, `/watchlist`, `/portfolio`; active item highlighted; mobile header on small screens | ✅ |
 | F3 | Live quotes | Prices and change % for up to 12 tickers per request, sourced from Finnhub via a server route; when the key is absent the UI shows “—” rather than invented prices | ✅ |
-| F4 | 60-second polling | Dashboard cards, watchlist and portfolio refresh every 60s and keep last-known values on failure | ✅ |
+| F4 | 30-second polling | Dashboard cards, watchlist, portfolio and stock page refresh every 30s, show "Updated Xs ago" and keep last-known values on failure | ✅ |
 | F5 | Watchlist | Add ticker (datalist suggestions), remove, live price + change, link to stock page | ✅ 🟡 local storage only |
 | F6 | Portfolio | Add position (ticker, quantity, **total** cost basis, purchase date, optional target); value, gain/loss % and target-hit computed from the live price | ✅ 🟡 local storage only |
 | F7 | Target price alert | "Target hit" badge when live price ≥ target on the portfolio page and dashboard summary | ✅ |
@@ -61,7 +62,7 @@ Legend: ✅ done · 🟡 partial · ⬜ not started
 | F14 | Auth (Google) | OAuth sign-in through Supabase | ⬜ |
 | F15 | Row-level security | Every user-owned table readable/writable only by `auth.uid() = user_id` | ⬜ |
 | F16 | Per-user persistence | Watchlist and portfolio survive sign-out/sign-in across devices | ⬜ |
-| F17 | Deployment | Published on Freebuff Sites with `FINNHUB_API_KEY` in Secrets | ⬜ |
+| F17 | Deployment | Published on Netlify (https://marketcap-zeroone.netlify.app) with `FINNHUB_API_KEY` in environment variables | ✅ |
 | F18 | No invented market data | Every displayed figure is live, user-entered or derived from a live value; unavailable data shows an explicit notice | ✅ |
 
 ## 6. Data model (Supabase Postgres — planned)
@@ -133,11 +134,17 @@ All responses are `cache-control: no-store`; missing key returns an empty result
 
 ## 8. Design requirements
 
-- Palette: ink `#101828`, muted `#667085`, line `#ecedf1`, canvas `#f6f7f9`, accent `#6c3bf4`,
-  up `#128a4b` / `#e7f7ee`, down `#d92d20` / `#fdecec`.
-- Typography: Geist (already wired through `next/font`), tabular numerals for all figures.
+- Palette (light): ink `#101828`, muted `#667085`, line `#ecedf1`, canvas `#f6f7f9`, accent
+  `#6c3bf4`, up `#128a4b` / `#e7f7ee`, down `#d92d20` / `#fdecec`.
+- Palette (dark, the default): ink `#f2f4f7`, muted `#98a2b3`, line `#242936`, canvas `#0a0c11`,
+  surface `#11141b`, accent `#a78bfa`, up `#4ade80`, down `#fca5a5`.
+- Categorical tones `--tone-1…6` colour news sources and company attributes consistently in both
+  themes (violet, teal, amber, rose, blue, lime).
+- Typography: Geist (already wired through `next/font`), tabular numerals for all figures; news
+  body copy 11–12.5 px so dense panels stay scannable.
 - Cards: 16–20px radius, hairline border, `0 1px 2px rgba(16,24,40,.04)` shadow.
-- Charts: hand-built SVG area charts with gradient fill and dashed grid (no chart dependency).
+- Charts: hand-built SVG — gradient area chart for portfolio history, candlesticks with an OHLC
+  hover and last-price line for price history (no chart dependency).
 - Responsive: 4-up → 2-up → 1-up card grid; sidebar collapses under 1024px; tables scroll.
 
 ## 9. Non-functional requirements

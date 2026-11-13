@@ -54,6 +54,7 @@ sample numbers; see [`DATA.md`](./DATA.md) for the per-field breakdown.
 | Intraday candlestick chart (1D/5D/1M) | Done, Yahoo-sourced |
 | Portfolio stock search with live suggestions | Done |
 | Dark mode (default) + light mode | Done |
+| News source colour coding, compact news/company panels | Done |
 | Supabase auth, RLS, cross-device data | **Not started** |
 | Top movers / screener | **Not started** (no free endpoint) |
 | Dashboard market-news card | API exists (`/api/news` without symbol); card not wired |
@@ -99,7 +100,7 @@ components/
   stock-actions.tsx       Add to watchlist / portfolio
   updated-ago.tsx         "Updated Xs ago · refreshes every 30s"
   theme-toggle.tsx        Light/Dark switch
-  icons.tsx               inline SVG icons and brand marks
+  icons.tsx               inline SVG icons and brand marks (plus search/sun/moon)
 lib/
   use-live-quotes.ts      polling hook (30s, batching, visibility refresh)
   use-local-store.ts      localStorage-backed list store
@@ -108,6 +109,9 @@ lib/
   stores.ts               keys, Position type, seeded defaults
   market-data.ts          ticker → name catalogue, quote lookup helper
   dashboard-data.ts       currency/percent formatting only
+  tone.ts                 stable categorical colours for news sources / company rows
+docs/                     HANDOVER, ARCHITECTURE, DEVELOPMENT, PRD, Plan, DATA, input
+screenshots/              review snapshots, git-ignored (light/ and dark/)
 ```
 
 ## 5. Environment

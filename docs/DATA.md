@@ -17,7 +17,7 @@ Last reviewed: 2026-11-13 · Provider: Finnhub (free tier) · Key: `FINNHUB_API_
 | Market capitalisation | `GET /stock/profile2` + `/stock/metric` | Stock page "Market cap" |
 | P/E ratio, 52-week high/low, beta, dividend yield | `GET /stock/metric?metric=all` | Stock page stats grid |
 | Per-stock headlines | `GET /company-news` | Stock page News panel (links open the publisher) |
-| Search suggestions (API) | `GET /search` | `/api/search` (UI not wired yet) |
+| Symbol search | `GET /search` | Portfolio search box (debounced), and directly via `/api/search` |
 | General market news (API) | `GET /news?category=general` | `/api/news` without `symbol` (dashboard card not wired yet) |
 | Intraday OHLC candles | **Yahoo Finance** chart endpoint (no key), not Finnhub | Stock page price history: 1D = 5m bars, 5D = 15m, 1M = 60m |
 
@@ -52,7 +52,7 @@ The browser never calls Finnhub directly. All five routes proxy the provider wit
 | Data | Why | What the UI does |
 |------|-----|------------------|
 | ~~Intraday price candles from Finnhub~~ | Finnhub returns **403 / plan-restricted** for free keys | Replaced: `/api/candles` now reads Yahoo Finance's public chart endpoint, so the stock page draws a real 1D/5D/1M candlestick chart instead of a notice |
-| Top movers / screener | No screener endpoint on the free plan | Feature not built yet (tracked in `Plan.md` stage 8) |
+| Top movers / screener | No screener endpoint on the free plan; a symbol list is available via `GET /stock/symbol?exchange=US` (one call, ~31k rows) | Not built yet — see `Plan.md` stage 8 and the notes in `HANDOVER.md` |
 | Trading volume | Not exposed by `/quote` on this plan | Removed from the holdings table; the column now shows **Quantity** from your own position |
 | Extended fundamentals (revenue, EPS history, etc.) | Paid metrics | Not shown at all |
 

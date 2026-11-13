@@ -1,7 +1,8 @@
 # MarketCap — Build Plan & Progress
 
 **Stack:** Next.js 16.4.6 (App Router, Turbopack) · React 19 · TypeScript · Tailwind v4 ·
-Finnhub (quotes/news/search) · Supabase (auth + Postgres + RLS, pending) · Freebuff Sites (pending)
+Finnhub (quotes/news/search) · Yahoo Finance (intraday candles) · Supabase (auth + Postgres + RLS,
+pending) · Netlify (deployed)
 
 Legend: ✅ done · 🟡 partial · ⬜ not started
 
@@ -11,21 +12,20 @@ Legend: ✅ done · 🟡 partial · ⬜ not started
 
 | Stage | Area | Status | Notes |
 |-------|------|--------|-------|
-| 0 | Requirements & design reference | ✅ | `input.md`, `PRD.md`, `ref.jpg` |
+| 0 | Requirements & design reference | ✅ | `docs/input.md`, `docs/PRD.md`, `ref.jpg` |
 | 1 | Project scaffold | ✅ | Next 16 + Tailwind v4 + TS + ESLint, `npm run build` clean |
 | 2 | Dashboard UI | ✅ | Matches `ref.jpg`: sidebar, cards, portfolio values, chart, table |
 | 3 | App shell & routed pages | ✅ | `/`, `/watchlist`, `/portfolio`, `/stocks/[ticker]` |
-| 4 | Live market data (Finnhub) | ✅ | Quotes, news, search routes + 60s polling on three pages |
+| 4 | Live market data (Finnhub + Yahoo) | ✅ | Quotes, profile, news, search, candles; 30s polling with a 20s server cache |
 | 5 | Supabase project & schema | ⬜ | Needs the Supabase project (blocked on credentials) |
 | 6 | Auth flows (email + Google) | ⬜ | Depends on stage 5 |
 | 7 | Per-user persistence + RLS | ⬜ | Replace `localStorage` store; verify two-account isolation |
-| 8 | Remaining product features | 🟡 | Top movers, market news feed, live stock page, search UI |
-| 9 | Deploy to Freebuff Sites | ⬜ | `sites_prepare_next`, secret, preview verification |
-| 10 | QA & polish | ⬜ | Empty states, loading states, brand logos, a11y pass |
+| 8 | Remaining product features | 🟡 | Portable search done; screener, top movers and market-news card outstanding |
+| 9 | Deployment | ✅ | Netlify: https://marketcap-zeroone.netlify.app (auto-deploy from `main`) |
+| 10 | QA & polish | 🟡 | Dark mode, colour-coded news sources, empty/loading states done; a11y pass and tests outstanding |
 
-**Overall:** ~55% of the product scope is implemented; the whole user-facing front end and the
-market data layer are working. Everything user-data related (auth, RLS, persistence) and
-deployment are outstanding.
+**Overall:** the whole user-facing front end, theming and the market data layer are working. Auth,
+per-user persistence (RLS), the screener and tests are outstanding.
 
 ---
 
@@ -72,7 +72,9 @@ deployment are outstanding.
 - [x] `app/api/news/route.ts` — `/company-news` per symbol or `/news?category=general`
 - [x] `app/api/search/route.ts` — symbol search filtered to common stock
 - [x] Key stays server-side via `FINNHUB_API_KEY` in `.env.local` (gitignored)
-- [x] `lib/use-live-quotes.ts` — poll immediately then every 60s, keep last known values
+- [x] `lib/use-live-quotes.ts` — fetch immediately then every 30s, keep last known values, refresh on tab focus
+- [x] `app/api/candles/route.ts` — Yahoo intraday OHLC (5m/15m/60m), 45s cache, stale fallback
+- [x] Quote cache: 20s per ticker, in-flight de-duplication, 5-minute stale fallback
 - [x] Wired into dashboard cards, watchlist and portfolio (value, gain/loss, target hit)
 - [x] Verified live: AAPL $354.88, NVDA $166.19, MSFT $523.00; news and search return real data
 
@@ -111,23 +113,26 @@ Blocked on: the Supabase project being created (URL, anon key, service-role key)
 - [x] Dashboard portfolio value, gain/loss and table computed from your positions + live quotes
 - [ ] Top movers (gainers/losers) on the home page — needs a fixed watch universe on the free tier
 - [ ] General market news feed card on the dashboard (route already exists)
-- [ ] Search UI in the sidebar/header using `/api/search`
+- [x] Search UI — portfolio search box filters positions and suggests symbols from `/api/search`
+- [ ] Screener: full US symbol list with logos, search and paging (planned, see `HANDOVER.md`)
 - [ ] Brand marks for the remaining tickers (NVDA, MSFT, AMZN, TSLA, …) instead of initials
 
-## Stage 9 — Deploy to Freebuff Sites ⬜
+## Stage 9 — Deploy ✅
 
-- [ ] `sites_prepare_next` for the Next.js app; local Wrangler preview with the real compatibility
-      date and bindings
-- [ ] Add `FINNHUB_API_KEY` (and Supabase values) under Sites → Secrets
-- [ ] Deploy preview, verify all pages, quotes/news, and auth callbacks on the deployed origin
-- [ ] Publish production once verified
+- [x] Hosted on Netlify: https://marketcap-zeroone.netlify.app (auto-deploy from `main`)
+- [x] `FINNHUB_API_KEY` set in Netlify environment variables; verified live via `/api/quotes`
+- [x] Production build verified locally (`npm run build`)
+- [ ] Re-verify after the next deploy: candles, dark theme, seeded defaults
+- [ ] Optional: migrate to Freebuff Sites (`sites_prepare_next` + secret + preview checks)
 
-## Stage 10 — QA & polish ⬜
+## Stage 10 — QA & polish 🟡
 
-- [ ] Loading skeletons for first paint; empty states for watchlist/portfolio
-- [ ] Error surface when Finnhub fails or rate-limits
+- [x] Loading states and empty states for watchlist/portfolio; skeleton on the stock route
+- [x] Error surfaces for Finnhub (per-ticker skip, stale fallback) and Yahoo (chart message)
+- [x] Dark theme across every screen, colour-coded news sources, compact type
+- [x] README, handover docs, data provenance and this plan
 - [ ] Keyboard/a11y pass on forms and the table
-- [ ] README with setup, env vars and commands
+- [ ] Automated tests (quote cache, candle parsing, portfolio maths)
 
 ---
 
@@ -142,9 +147,11 @@ app/
   api/quotes|news|search  Finnhub proxy routes (dynamic, key server-side)
   layout.tsx globals.css  shell + Tailwind tokens
 components/               sidebar, app-shell, cards, table, charts, icons, actions
-lib/                      dashboard-data, market-data, stores, hooks, polling
-PRD.md Plan.md input.md   requirements, roadmap, captured inputs
-DATA.md README.md         data provenance and project overview
+lib/                      dashboard-data, market-data, stores, hooks, polling, tone
+/docs/                    HANDOVER, ARCHITECTURE, DEVELOPMENT, PRD, Plan, DATA, input
+README.md                 project overview (repo home page)
+ref.jpg                   design reference
+screenshots/              review snapshots (git-ignored)
 ```
 
 ## How to verify
@@ -179,3 +186,11 @@ curl "localhost:4310/api/search?q=apple"
 - **2026-11-13** — Removed all mock market data. Added `/api/profile` and `/api/candles`, moved the
   stock page and dashboard onto live sources, made the statistics chart plot only recorded live
   observations, and documented provenance in `DATA.md`.
+- **2026-11-13** — Portfolio-wide bug pass (phantom totals, mobile nav, dead controls, validation).
+- **2026-11-13** — Dark theme with semantic tokens, portfolio stock search, 30s refresh with an
+  "Updated Xs ago" label and a 20s server-side quote cache.
+- **2026-11-13** — Real intraday candlesticks from Yahoo (`1d`/`5d`/`1mo`), replacing the
+  "not in the free plan" notice.
+- **2026-11-13** — Four seeded positions and watchlist tickers, dark mode as the default, handover
+  docs (`docs/HANDOVER.md`, `docs/ARCHITECTURE.md`, `docs/DEVELOPMENT.md`), screenshots moved to a
+  git-ignored `screenshots/` folder, colour-coded news sources and compact news/company panels.

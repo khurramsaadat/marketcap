@@ -23,7 +23,8 @@ Full per-field breakdown: **[`docs/DATA.md`](./docs/DATA.md)**.
 - Next.js 16 (App Router, Turbopack) · React 19 · TypeScript
 - Tailwind CSS v4 (theme tokens in `app/globals.css`)
 - Finnhub free tier — quotes, company profile, metrics, company news, search
-- Supabase auth + Postgres + RLS — planned, see `Plan.md`
+- Yahoo Finance public chart endpoint — intraday candles for the price-history chart
+- Supabase auth + Postgres + RLS — planned, see [`docs/Plan.md`](./docs/Plan.md)
 
 ## Getting started
 
@@ -104,5 +105,6 @@ Project background:
 
 ## Not done yet
 
-Supabase auth (email/password + Google) with per-user rows and RLS, top movers, the general-news card
-on the dashboard, streaming prices, and automated tests. Details in `Plan.md` and `HANDOVER.md`.
+Supabase auth (email/password + Google) with per-user rows and RLS, a screener, top movers, the
+general-news card on the dashboard, streaming prices, and automated tests. Details in
+[`docs/Plan.md`](./docs/Plan.md) and [`docs/HANDOVER.md`](./docs/HANDOVER.md).

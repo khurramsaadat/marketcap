@@ -61,6 +61,8 @@ Second identical quote/candle call should report `"cached": true`.
 - **Server components by default.** Add `"use client"` only where you need state, effects or events.
 - **Colours come from tokens**, not hex values: use `bg-surface`, `text-muted`, `border-line`,
   `text-up`… and add new tokens to **both** `:root` and `.dark` in `app/globals.css`.
+- **Categorical colour** (news sources, company attributes) comes from `lib/tone.ts` and the
+  `--tone-1…6` tokens — use `toneFor(name)` instead of inventing a colour per case.
 - **Formatting helpers**: `formatCurrency` / `formatPercent` from `lib/dashboard-data.ts`; the
   `Stat` and table components handle "—" for missing values.
 - **Quote access**: `useLiveQuotes(tickers)` returns `{ quotes, updatedAt }`; never fetch Finnhub
