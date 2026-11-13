@@ -7,6 +7,7 @@ import { StockCard } from "@/components/stock-card";
 import { StockTable, type StockRowData } from "@/components/stock-table";
 import { findQuote } from "@/lib/market-data";
 import { PORTFOLIO_KEY, seedPositions, type Position } from "@/lib/stores";
+import { UpdatedAgo } from "@/components/updated-ago";
 import { useLiveQuotes } from "@/lib/use-live-quotes";
 import { useLocalStore } from "@/lib/use-local-store";
 import { recordValue, useValueHistory } from "@/lib/use-value-history";
@@ -32,7 +33,7 @@ export function DashboardLive() {
     () => Array.from(new Set([...MARKET_WATCH, ...positions.map((p) => p.ticker)])),
     [positions],
   );
-  const { quotes } = useLiveQuotes(tickers);
+  const { quotes, updatedAt } = useLiveQuotes(tickers);
   const history = useValueHistory();
   const [sortMode, setSortMode] = useState<SortMode>("none");
 
@@ -98,9 +99,11 @@ export function DashboardLive() {
 
   return (
     <>
-      <p className="mb-3 text-[12.5px] text-muted">
-        Live prices from Finnhub, refreshed every 60 seconds.
-      </p>
+      <div className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px] text-muted">
+        <span>Live prices from Finnhub</span>
+        <span className="text-faint">·</span>
+        <UpdatedAgo at={updatedAt} className="text-[12.5px] text-faint" />
+      </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {MARKET_WATCH.map((ticker) => {

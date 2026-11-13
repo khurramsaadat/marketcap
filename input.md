@@ -17,7 +17,7 @@ Source of truth for `PRD.md` and `Plan.md`.
 | 3 | Market data provider | Finnhub free tier. User has an API key. |
 | 4 | News source | Same provider as pricing (Finnhub). |
 | 5 | Framework / styling | Latest Next.js and TailwindCSS. |
-| 6 | Real-time updates | Polling every 60 seconds. |
+| 6 | Real-time updates | Polling every 30 seconds. |
 | 7 | Portfolio fields | Ticker + quantity, cost basis, purchase date, target price. |
 | 8 | Gain / loss | Auto-compute from the current Finnhub price ("use your best judgement" → computed). |
 | 9 | Target price behaviour | Yes — visual alert on the dashboard when price crosses the target. |

@@ -23,13 +23,21 @@ Last reviewed: 2026-11-13 · Provider: Finnhub (free tier) · Key: `FINNHUB_API_
 The browser never calls Finnhub directly. All five routes proxy the provider with the key held in
 `process.env.FINNHUB_API_KEY`.
 
+## ⏱️ Refresh cadence and caching
+
+| Layer | Behaviour |
+|-------|-----------|
+| Browser | Every mounted price polls `/api/quotes` every **30 seconds**, and immediately when a background tab becomes visible again. The UI shows "Updated Xs ago" next to the prices. |
+| `/api/quotes` | Each ticker is cached in memory for **20 seconds**; concurrent requests for the same symbol share one upstream call. If Finnhub fails (429 or network), the last known price is served for up to **5 minutes** rather than dropping the row. |
+| Why it matters | Finnhub's free plan allows 60 calls/minute for the whole key and charges one call per ticker, so the cache is what makes 30-second polling safe with several tabs or visitors. |
+
 ## ✅ Real user data (entered by you, not seeded)
 
 | Data | Storage | Notes |
 |------|---------|-------|
 | Watchlist tickers | This browser (`localStorage`, key `marketcap.watchlist`) | Moves to Supabase with auth |
 | Positions: ticker, quantity, **total** cost basis, purchase date, target price | This browser (`localStorage`, key `marketcap.portfolio`) | No demo positions are seeded |
-| Portfolio value, gain/loss and gain/loss % | Computed: live price × quantity vs. your cost basis | Recomputed on every 60-second poll |
+| Portfolio value, gain/loss and gain/loss % | Computed: live price × quantity vs. your cost basis | Recomputed on every 30-second poll |
 | Target-hit badge | Computed: live price ≥ your target price | Only appears for your own positions |
 
 ## ✅ Derived from real observations

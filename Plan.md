@@ -106,7 +106,7 @@ Blocked on: the Supabase project being created (URL, anon key, service-role key)
 - [x] Portfolio fields: quantity, total cost basis, purchase date, target price
 - [x] Auto gain/loss from live price; target-hit badge
 - [x] Stock page uses live quote + `/api/profile` metrics + `/api/news` headlines
-- [x] Live price polling on the stock detail page (60s via `useLiveQuotes`)
+- [x] Live price polling on the stock detail page (30s via `useLiveQuotes`)
 - [x] Removed every invented market figure (see `DATA.md` → “Mock data that was removed”)
 - [x] Dashboard portfolio value, gain/loss and table computed from your positions + live quotes
 - [ ] Top movers (gainers/losers) on the home page — needs a fixed watch universe on the free tier

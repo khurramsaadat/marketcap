@@ -6,6 +6,7 @@ import { ChangeArrow, StockLogo } from "@/components/icons";
 import { LineChart } from "@/components/line-chart";
 import { StockActions } from "@/components/stock-actions";
 import { formatCurrency, formatPercent } from "@/lib/dashboard-data";
+import { UpdatedAgo } from "@/components/updated-ago";
 import { useLiveQuotes } from "@/lib/use-live-quotes";
 
 type Profile = {
@@ -52,7 +53,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 export function StockDetail({ ticker: rawTicker }: { ticker: string }) {
   const ticker = rawTicker.toUpperCase();
 
-  const { quotes } = useLiveQuotes([ticker]);
+  const { quotes, updatedAt } = useLiveQuotes([ticker]);
   const quote = quotes[ticker];
 
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -148,6 +149,10 @@ export function StockDetail({ ticker: rawTicker }: { ticker: string }) {
               {formatPercent(quote.changePct)} today
             </span>
           ) : null}
+        </div>
+
+        <div className="mt-2">
+          <UpdatedAgo at={updatedAt} />
         </div>
 
         <dl className="mt-6 grid grid-cols-2 gap-4 border-t border-line pt-5 sm:grid-cols-4">

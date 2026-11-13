@@ -7,12 +7,13 @@ import { ChangeArrow, PlusIcon, StockLogo } from "@/components/icons";
 import { formatCurrency, formatPercent } from "@/lib/dashboard-data";
 import { findQuote, quotes } from "@/lib/market-data";
 import { WATCHLIST_KEY, seedWatchlist } from "@/lib/stores";
+import { UpdatedAgo } from "@/components/updated-ago";
 import { useLiveQuotes } from "@/lib/use-live-quotes";
 import { useLocalStore } from "@/lib/use-local-store";
 
 export default function WatchlistPage() {
   const [tickers, setTickers] = useLocalStore<string>(WATCHLIST_KEY, seedWatchlist);
-  const { quotes: liveQuotes } = useLiveQuotes(tickers);
+  const { quotes: liveQuotes, updatedAt } = useLiveQuotes(tickers);
   const [draft, setDraft] = useState("");
   const [message, setMessage] = useState<string | null>(null);
 
@@ -51,6 +52,9 @@ export default function WatchlistPage() {
           <p className="mt-1 text-[13px] text-muted">
             Everything you are keeping an eye on, in one list.
           </p>
+          <div className="mt-1">
+            <UpdatedAgo at={updatedAt} />
+          </div>
         </div>
         <form onSubmit={addTicker} className="flex items-center gap-2">
           <input

@@ -12,7 +12,10 @@ export type LiveQuote = {
   low: number;
 };
 
-const POLL_MS = 60_000;
+/** Refresh cadence for every price on screen. Keep in sync with the UI copy. */
+export const POLL_MS = 30_000;
+export const POLL_SECONDS = POLL_MS / 1000;
+
 const BATCH_SIZE = 12;
 
 type QuotesResponse = { quotes?: Record<string, LiveQuote> };
@@ -30,6 +33,7 @@ export function useLiveQuotes(tickers: string[]) {
   useEffect(() => {
     if (!key) return;
     let active = true;
+    let busy = false;
 
     const list = key.split(",").filter(Boolean);
     const batches: string[][] = [];
@@ -38,6 +42,10 @@ export function useLiveQuotes(tickers: string[]) {
     }
 
     const load = async () => {
+      // A slow response should not stack up behind the next tick.
+      if (busy) return;
+      busy = true;
+
       try {
         const responses = await Promise.all(
           batches.map((batch) =>
@@ -61,15 +69,24 @@ export function useLiveQuotes(tickers: string[]) {
         setUpdatedAt(Date.now());
       } catch {
         // keep the last known prices when the network is unavailable
+      } finally {
+        busy = false;
       }
     };
 
     void load();
     const interval = window.setInterval(load, POLL_MS);
 
+    // Coming back to a background tab shouldn't wait for the next tick.
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void load();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
     return () => {
       active = false;
       window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, [key]);
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { AppShell } from "@/components/app-shell";
 import { ChangeArrow, PlusIcon, SearchIcon, StockLogo } from "@/components/icons";
+import { UpdatedAgo } from "@/components/updated-ago";
 import { formatCurrency, formatPercent } from "@/lib/dashboard-data";
 import { findQuote, quotes } from "@/lib/market-data";
 import { PORTFOLIO_KEY, seedPositions, type Position } from "@/lib/stores";
@@ -39,7 +40,7 @@ export default function PortfolioPage() {
     PORTFOLIO_KEY,
     seedPositions,
   );
-  const { quotes: liveQuotes } = useLiveQuotes(
+  const { quotes: liveQuotes, updatedAt } = useLiveQuotes(
     positions.map((position) => position.ticker),
   );
   const [formOpen, setFormOpen] = useState(false);
@@ -318,6 +319,9 @@ export default function PortfolioPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-3">
             <h2 className="text-[16px] font-semibold text-ink">My Stock</h2>
+            {positions.length > 0 ? (
+              <UpdatedAgo at={updatedAt} className="text-[11.5px] text-faint" />
+            ) : null}
             {positions.length > 0 &&
             positions.some((p) => livePrice(liveQuotes[p.ticker]) === undefined) ? (
               <span className="text-[11.5px] text-faint">

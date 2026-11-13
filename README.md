@@ -69,7 +69,10 @@ npm start       # serve the production build
 | `/api/search` | Finnhub symbol search (`?q=apple`) |
 | `/api/candles` | Intraday candles; reports `available: false` when the plan blocks them |
 
-Quotes are polled every 60 seconds on the dashboard, watchlist and portfolio.
+Quotes are polled every 30 seconds on the dashboard, watchlist, portfolio and stock pages.
+Each ticker is cached for 20 seconds server-side, so several tabs or visitors polling at once
+share a single Finnhub call, and a failed lookup falls back to the last known price for up to
+five minutes instead of blanking the row.
 
 ## Documentation
 

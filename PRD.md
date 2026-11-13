@@ -13,7 +13,7 @@ against cost basis and target prices, and read market news — modelled on Googl
 `ref.jpg` dashboard design.
 
 **Current state:** a working Next.js app with a routed shell, four pages, live Finnhub quotes,
-company profiles, metrics and news polled every 60 seconds, and browser-local portfolio/watchlist
+company profiles, metrics and news polled every 30 seconds, and browser-local portfolio/watchlist
 storage. Authentication, per-user database rows and hosting are not wired yet. No invented market
 data is displayed anywhere — see `DATA.md`.
 
