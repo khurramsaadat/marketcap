@@ -16,7 +16,7 @@ MarketCap does **not** ship invented market data.
 - Portfolio and watchlist entries are your own input, stored in this browser until Supabase auth
   is connected.
 
-Full per-field breakdown: **[`DATA.md`](./DATA.md)**.
+Full per-field breakdown: **[`docs/DATA.md`](./docs/DATA.md)**.
 
 ## Stack
 
@@ -85,18 +85,21 @@ five minutes instead of blanking the row.
 
 ## Documentation
 
+All project documentation lives in **[`docs/`](./docs)**. This README stays at the repository root
+because GitHub renders it as the project home page.
+
 **Picking the project up?** Start with the handover set:
 
-- [`HANDOVER.md`](./HANDOVER.md) — status, file map, constraints, next steps
-- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — data flow, API contracts, state, theming
-- [`DEVELOPMENT.md`](./DEVELOPMENT.md) — setup, conventions, deploy, troubleshooting
+- [`docs/HANDOVER.md`](./docs/HANDOVER.md) — status, file map, constraints, next steps
+- [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) — data flow, API contracts, state, theming
+- [`docs/DEVELOPMENT.md`](./docs/DEVELOPMENT.md) — setup, conventions, deploy, troubleshooting
 
 Project background:
 
-- [`PRD.md`](./PRD.md) — requirements and acceptance criteria
-- [`Plan.md`](./Plan.md) — stagewise plan and current progress
-- [`DATA.md`](./DATA.md) — what is live, derived, static or unavailable
-- [`input.md`](./input.md) — the requirements and decisions this build came from
+- [`docs/PRD.md`](./docs/PRD.md) — requirements and acceptance criteria
+- [`docs/Plan.md`](./docs/Plan.md) — stagewise plan and current progress
+- [`docs/DATA.md`](./docs/DATA.md) — what is live, derived, static or unavailable
+- [`docs/input.md`](./docs/input.md) — the requirements and decisions this build came from
 - [`ref.jpg`](./ref.jpg) — the dashboard design reference
 
 ## Not done yet
