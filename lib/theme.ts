@@ -39,5 +39,6 @@ export function toggleTheme() {
 }
 
 export function useTheme(): Theme {
-  return useSyncExternalStore(subscribe, readTheme, () => "light");
+  // Dark is the default, so the server snapshot matches an unstyled first visit.
+  return useSyncExternalStore(subscribe, readTheme, () => "dark");
 }

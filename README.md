@@ -76,7 +76,22 @@ Each ticker is cached for 20 seconds server-side, so several tabs or visitors po
 share a single Finnhub call, and a failed lookup falls back to the last known price for up to
 five minutes instead of blanking the row.
 
+## Defaults
+
+- The site opens in **dark mode**; a Light/Dark choice is remembered per browser.
+- A first-time visitor starts with four example positions and the same four watchlist tickers:
+  **AAPL, MSFT, NVDA, AMZN**, one share each (`lib/stores.ts`). Prices are always live and your own
+  rows replace them as soon as you edit.
+
 ## Documentation
+
+**Picking the project up?** Start with the handover set:
+
+- [`HANDOVER.md`](./HANDOVER.md) — status, file map, constraints, next steps
+- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — data flow, API contracts, state, theming
+- [`DEVELOPMENT.md`](./DEVELOPMENT.md) — setup, conventions, deploy, troubleshooting
+
+Project background:
 
 - [`PRD.md`](./PRD.md) — requirements and acceptance criteria
 - [`Plan.md`](./Plan.md) — stagewise plan and current progress
@@ -86,5 +101,5 @@ five minutes instead of blanking the row.
 
 ## Not done yet
 
-Supabase auth (email/password + Google), per-user rows with RLS, deployment to Freebuff Sites,
-top movers, general-news card on the dashboard, and a search UI. Details in `Plan.md`.
+Supabase auth (email/password + Google) with per-user rows and RLS, top movers, the general-news card
+on the dashboard, streaming prices, and automated tests. Details in `Plan.md` and `HANDOVER.md`.

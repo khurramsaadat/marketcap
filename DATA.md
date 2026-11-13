@@ -37,7 +37,7 @@ The browser never calls Finnhub directly. All five routes proxy the provider wit
 | Data | Storage | Notes |
 |------|---------|-------|
 | Watchlist tickers | This browser (`localStorage`, key `marketcap.watchlist`) | Moves to Supabase with auth |
-| Positions: ticker, quantity, **total** cost basis, purchase date, target price | This browser (`localStorage`, key `marketcap.portfolio`) | No demo positions are seeded |
+| Positions: ticker, quantity, **total** cost basis, purchase date, target price | This browser (`localStorage`, key `marketcap.portfolio`) | Four example positions (AAPL, MSFT, NVDA, AMZN; 1 share each) are seeded on first run. Their cost basis is the reference price recorded on 2026-11-13 — gain/loss afterwards is real movement, not mock data |
 | Portfolio value, gain/loss and gain/loss % | Computed: live price × quantity vs. your cost basis | Recomputed on every 30-second poll |
 | Target-hit badge | Computed: live price ≥ your target price | Only appears for your own positions |
 
@@ -62,7 +62,7 @@ The browser never calls Finnhub directly. All five routes proxy the provider wit
 |------|-------|----------------------|
 | A short ticker → name catalogue (AAPL, MSFT, GOOGL, AMZN, NVDA, META, TSLA, SPOT, NFLX, JPM) | `lib/market-data.ts` | Powers the datalist suggestions in the watchlist/portfolio forms and the dashboard's fixed market-watch tickers. Names are only a label; the price beside them is live. |
 | Brand logos for AAPL, GOOGL, SPOT, TWTR | `components/icons.tsx` | Inline SVG brand marks. Other tickers fall back to a two-letter badge. |
-| Default watchlist of three tickers (`AAPL`, `MSFT`, `NVDA`) | `lib/stores.ts` | An initial selection only — no prices or positions are invented. |
+| Default watchlist of four tickers (`AAPL`, `MSFT`, `NVDA`, `AMZN`) | `lib/stores.ts` | An initial selection only — no prices are invented; every quote is live. |
 
 ## 🗑️ Mock data that was removed
 
@@ -73,8 +73,8 @@ Earlier builds shipped invented market data. These were deleted and replaced wit
   and percentages.
 - `priceHistory()`, `newsFor()`, `marketNews()` (synthetic price series and article copy) — removed
   from `lib/market-data.ts`.
-- Seeded positions (AAPL/GOOGL/SPOT with invented quantities and cost bases) — `seedPositions` is
-  now empty; the portfolio starts with no rows.
+- Invented seeded positions (AAPL/GOOGL/SPOT with made-up quantities and prices) — replaced by four
+  clearly-labelled example positions in `lib/stores.ts` whose cost basis is a dated reference price.
 - The stock page's fake "About" paragraph and invented P/E, market cap and 52-week range — replaced
   by `/api/profile` values, or "—" when Finnhub has none.
 

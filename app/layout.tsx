@@ -12,7 +12,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const themeScript = `(function(){try{var stored=localStorage.getItem("marketcap.theme");var dark=stored?stored==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.classList.toggle("dark",dark);}catch(e){}})();`;
+// Dark is the default; a saved choice in localStorage always wins.
+const themeScript = `(function(){try{var stored=localStorage.getItem("marketcap.theme");var dark=stored?stored==="dark":true;document.documentElement.classList.toggle("dark",dark);}catch(e){}})();`;
 
 export const metadata: Metadata = {
   title: "MarketCap — Portfolio Dashboard",
