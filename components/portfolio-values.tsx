@@ -33,7 +33,7 @@ export function PortfolioValues({
   const up = gain >= 0;
 
   return (
-    <section className="flex flex-col rounded-2xl border border-line bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+    <section className="flex flex-col rounded-2xl border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
       <div className="flex items-start justify-between">
         <h2 className="text-[16px] font-semibold text-ink">Portfolio Values</h2>
         <span
@@ -86,7 +86,7 @@ export function PortfolioValues({
           className={`h-10 rounded-full px-5 text-[13px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
             sortMode === "worst"
               ? "border border-accent/30 bg-accent-soft text-accent"
-              : "border border-line bg-white text-ink-soft hover:bg-[#f8f9fa]"
+              : "border border-line bg-surface text-ink-soft hover:bg-surface-muted"
           }`}
         >
           Worst Performance
@@ -98,8 +98,8 @@ export function PortfolioValues({
           disabled={!hasPositions}
           className={`h-10 rounded-full px-5 text-[13px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
             sortMode === "top"
-              ? "bg-[#5f31e0] text-white shadow-[0_6px_16px_rgba(108,59,244,0.28)]"
-              : "bg-accent text-white shadow-[0_6px_16px_rgba(108,59,244,0.28)] hover:bg-[#5f31e0]"
+              ? "bg-accent text-on-accent shadow-[0_6px_16px_rgba(108,59,244,0.28)]"
+              : "border border-line bg-surface text-ink-soft hover:bg-surface-muted"
           }`}
         >
           Top Performance
@@ -109,16 +109,16 @@ export function PortfolioValues({
       <div className="mt-auto pt-5">
         <Link
           href="/portfolio"
-          className="flex w-full items-center gap-3 rounded-2xl bg-accent-soft p-3.5 text-left transition-colors hover:bg-[#eae2fd]"
+          className="flex w-full items-center gap-3 rounded-2xl bg-accent-soft p-3.5 text-left transition-colors hover:bg-accent-soft/70"
         >
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/70 text-[#7c5cfc]">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface/70 text-accent">
             <SparkleIcon className="size-[18px]" />
           </span>
-          <span className="flex-1 text-[12.5px] leading-snug text-[#5b4ba8]">
+          <span className="flex-1 text-[12.5px] leading-snug text-accent-ink">
             Here&apos;s to improve your portfolio and understanding how investing
             works.
           </span>
-          <ChevronRightIcon className="size-4 shrink-0 text-[#7c6be0]" />
+          <ChevronRightIcon className="size-4 shrink-0 text-accent" />
         </Link>
       </div>
     </section>

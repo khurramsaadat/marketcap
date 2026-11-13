@@ -19,9 +19,9 @@ async function StockContent({ params }: { params: Promise<StockParams> }) {
 function StockFallback() {
   return (
     <div className="space-y-5">
-      <div className="h-4 w-24 animate-pulse rounded-full bg-[#eceef2]" />
-      <div className="h-[260px] animate-pulse rounded-2xl border border-line bg-white" />
-      <div className="h-[220px] animate-pulse rounded-2xl border border-line bg-white" />
+      <div className="h-4 w-24 animate-pulse rounded-full bg-surface-muted" />
+      <div className="h-[260px] animate-pulse rounded-2xl border border-line bg-surface" />
+      <div className="h-[220px] animate-pulse rounded-2xl border border-line bg-surface" />
     </div>
   );
 }

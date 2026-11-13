@@ -27,8 +27,8 @@ export function MobileNav() {
             aria-current={active ? "page" : undefined}
             className={`shrink-0 rounded-full border px-4 py-2 text-[13px] font-medium transition-colors ${
               active
-                ? "border-transparent bg-[#f2f3f5] text-ink"
-                : "border-line bg-white text-ink-soft hover:bg-[#f8f9fa]"
+                ? "border-transparent bg-surface-muted text-ink"
+                : "border-line bg-surface text-ink-soft hover:bg-surface-muted"
             }`}
           >
             {label}

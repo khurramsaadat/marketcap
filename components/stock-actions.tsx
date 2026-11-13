@@ -66,8 +66,8 @@ export function StockActions({
           onClick={toggleWatchlist}
           className={`h-10 rounded-full px-5 text-[13px] font-medium transition-colors ${
             inWatchlist
-              ? "border border-line bg-[#f8f9fa] text-ink-soft"
-              : "border border-line bg-white text-ink-soft hover:bg-[#f8f9fa]"
+              ? "border border-line bg-surface-muted text-ink-soft"
+              : "border border-line bg-surface text-ink-soft hover:bg-surface-muted"
           }`}
         >
           {inWatchlist ? "In watchlist" : "Add to watchlist"}
@@ -75,7 +75,7 @@ export function StockActions({
         <button
           type="button"
           onClick={addToPortfolio}
-          className="h-10 rounded-full bg-accent px-5 text-[13px] font-medium text-white shadow-[0_6px_16px_rgba(108,59,244,0.28)] transition-colors hover:bg-[#5f31e0]"
+          className="h-10 rounded-full bg-accent px-5 text-[13px] font-medium text-on-accent shadow-[0_6px_16px_rgba(108,59,244,0.28)] transition-colors hover:bg-accent-strong"
         >
           Add to portfolio
         </button>

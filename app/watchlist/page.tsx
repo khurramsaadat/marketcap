@@ -59,7 +59,7 @@ export default function WatchlistPage() {
             onChange={(event) => setDraft(event.target.value.toUpperCase())}
             placeholder="Add ticker"
             aria-label="Add ticker"
-            className="h-10 w-40 rounded-full border border-line bg-white px-4 text-[13px] text-ink outline-none transition-colors placeholder:text-faint focus:border-accent/60 focus:ring-2 focus:ring-accent/10"
+            className="h-10 w-40 rounded-full border border-line bg-surface px-4 text-[13px] text-ink outline-none transition-colors placeholder:text-faint focus:border-accent/60 focus:ring-2 focus:ring-accent/10"
           />
           <datalist id="watchlist-options">
             {quotes.map((quote) => (
@@ -70,7 +70,7 @@ export default function WatchlistPage() {
           </datalist>
           <button
             type="submit"
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-accent px-5 text-[13px] font-medium text-white shadow-[0_6px_16px_rgba(108,59,244,0.28)] transition-colors hover:bg-[#5f31e0]"
+            className="inline-flex h-10 items-center gap-2 rounded-full bg-accent px-5 text-[13px] font-medium text-on-accent shadow-[0_6px_16px_rgba(108,59,244,0.28)] transition-colors hover:bg-accent-strong"
           >
             <PlusIcon />
             Add
@@ -84,7 +84,7 @@ export default function WatchlistPage() {
         </p>
       ) : null}
 
-      <section className="mt-5 rounded-2xl border border-line bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+      <section className="mt-5 rounded-2xl border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
         <h2 className="text-[16px] font-semibold text-ink">Watchlist</h2>
 
         {tickers.length === 0 ? (

@@ -63,7 +63,7 @@ function Row({ row }: { row: StockRowData }) {
 
 export function StockTable({ rows }: { rows: StockRowData[] }) {
   return (
-    <section className="rounded-2xl border border-line bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+    <section className="rounded-2xl border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
       <h2 className="text-[16px] font-semibold text-ink">My Stock</h2>
 
       {rows.length === 0 ? (

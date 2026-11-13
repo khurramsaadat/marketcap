@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { AppShell } from "@/components/app-shell";
-import { ChangeArrow, PlusIcon, StockLogo } from "@/components/icons";
+import { ChangeArrow, PlusIcon, SearchIcon, StockLogo } from "@/components/icons";
 import { formatCurrency, formatPercent } from "@/lib/dashboard-data";
 import { findQuote, quotes } from "@/lib/market-data";
 import { PORTFOLIO_KEY, seedPositions, type Position } from "@/lib/stores";
@@ -31,7 +31,7 @@ function formatDate(value: string) {
 }
 
 const fieldClass =
-  "h-10 w-full rounded-xl border border-line bg-white px-3 text-[13.5px] text-ink outline-none transition-colors placeholder:text-faint focus:border-accent/60 focus:ring-2 focus:ring-accent/10";
+  "h-10 w-full rounded-xl border border-line bg-surface px-3 text-[13.5px] text-ink outline-none transition-colors placeholder:text-faint focus:border-accent/60 focus:ring-2 focus:ring-accent/10";
 const labelClass = "mb-1.5 block text-[12px] font-medium text-muted";
 
 export default function PortfolioPage() {
@@ -44,6 +44,10 @@ export default function PortfolioPage() {
   );
   const [formOpen, setFormOpen] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<
+    { ticker: string; name: string }[]
+  >([]);
   const [draft, setDraft] = useState({
     ticker: "",
     quantity: "",
@@ -51,6 +55,44 @@ export default function PortfolioPage() {
     purchaseDate: "",
     targetPrice: "",
   });
+
+  const trimmedQuery = query.trim();
+
+  useEffect(() => {
+    if (trimmedQuery.length < 2) return;
+    let active = true;
+
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `/api/search?q=${encodeURIComponent(trimmedQuery)}`,
+        );
+        if (!response.ok) return;
+        const data = (await response.json()) as {
+          results?: { ticker: string; name: string }[];
+        };
+        if (active) setSuggestions((data.results ?? []).slice(0, 6));
+      } catch {
+        // leave the previous suggestions in place
+      }
+    }, 250);
+
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [trimmedQuery]);
+
+  const visiblePositions = useMemo(() => {
+    if (!trimmedQuery) return positions;
+    const term = trimmedQuery.toLowerCase();
+    return positions.filter((position) => {
+      const name = findQuote(position.ticker)?.name?.toLowerCase() ?? "";
+      return (
+        position.ticker.toLowerCase().includes(term) || name.includes(term)
+      );
+    });
+  }, [positions, trimmedQuery]);
 
   const totals = useMemo(() => {
     let invested = 0;
@@ -131,7 +173,7 @@ export default function PortfolioPage() {
         <button
           type="button"
           onClick={() => setFormOpen((open) => !open)}
-          className="inline-flex h-10 items-center gap-2 rounded-full bg-accent px-5 text-[13px] font-medium text-white shadow-[0_6px_16px_rgba(108,59,244,0.28)] transition-colors hover:bg-[#5f31e0]"
+          className="inline-flex h-10 items-center gap-2 rounded-full bg-accent px-5 text-[13px] font-medium text-on-accent shadow-[0_6px_16px_rgba(108,59,244,0.28)] transition-colors hover:bg-accent-strong"
         >
           <PlusIcon />
           Add position
@@ -153,7 +195,7 @@ export default function PortfolioPage() {
       {formOpen ? (
         <form
           onSubmit={addPosition}
-          className="mt-5 rounded-2xl border border-line bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]"
+          className="mt-5 rounded-2xl border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]"
         >
           <h2 className="text-[15px] font-semibold text-ink">New position</h2>
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
@@ -257,14 +299,14 @@ export default function PortfolioPage() {
           <div className="mt-5 flex items-center gap-2.5">
             <button
               type="submit"
-              className="h-10 rounded-full bg-accent px-5 text-[13px] font-medium text-white transition-colors hover:bg-[#5f31e0]"
+              className="h-10 rounded-full bg-accent px-5 text-[13px] font-medium text-on-accent transition-colors hover:bg-accent-strong"
             >
               Save position
             </button>
             <button
               type="button"
               onClick={() => setFormOpen(false)}
-              className="h-10 rounded-full border border-line bg-white px-5 text-[13px] font-medium text-ink-soft transition-colors hover:bg-[#f8f9fa]"
+              className="h-10 rounded-full border border-line bg-surface px-5 text-[13px] font-medium text-ink-soft transition-colors hover:bg-surface-muted"
             >
               Cancel
             </button>
@@ -272,16 +314,60 @@ export default function PortfolioPage() {
         </form>
       ) : null}
 
-      <section className="mt-5 rounded-2xl border border-line bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-[16px] font-semibold text-ink">My Stock</h2>
-          {positions.length > 0 &&
-          positions.some((p) => livePrice(liveQuotes[p.ticker]) === undefined) ? (
-            <span className="text-[11.5px] text-faint">
-              Some positions have no live quote yet
-            </span>
-          ) : null}
+      <section className="mt-5 rounded-2xl border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <h2 className="text-[16px] font-semibold text-ink">My Stock</h2>
+            {positions.length > 0 &&
+            positions.some((p) => livePrice(liveQuotes[p.ticker]) === undefined) ? (
+              <span className="text-[11.5px] text-faint">
+                Some positions have no live quote yet
+              </span>
+            ) : null}
+          </div>
+          <div className="relative">
+            <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-faint" />
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search stocks or positions"
+              aria-label="Search portfolio"
+              className="h-9 w-full rounded-full border border-line bg-surface py-1 pl-9 pr-3 text-[12.5px] text-ink outline-none transition-colors placeholder:text-faint focus:border-accent/60 focus:ring-2 focus:ring-accent/10 sm:w-64"
+            />
+          </div>
         </div>
+
+        {trimmedQuery.length >= 2 && suggestions.length > 0 ? (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {suggestions.map((suggestion) => {
+              const held = positions.some(
+                (position) => position.ticker === suggestion.ticker,
+              );
+
+              return (
+                <button
+                  key={suggestion.ticker}
+                  type="button"
+                  onClick={() => {
+                    setDraft({ ...draft, ticker: suggestion.ticker });
+                    setFormOpen(true);
+                  }}
+                  className="flex max-w-[240px] items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-[12px] text-ink-soft transition-colors hover:bg-surface-muted"
+                >
+                  <span className="font-semibold text-ink">{suggestion.ticker}</span>
+                  <span className="truncate text-muted">{suggestion.name}</span>
+                  <PlusIcon className="size-3 shrink-0 text-accent" />
+                  {held ? (
+                    <span className="shrink-0 text-[10px] uppercase tracking-wide text-faint">
+                      Held
+                    </span>
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
 
         {positions.length === 0 ? (
           <div className="mt-6 rounded-xl border border-dashed border-line px-6 py-10 text-center">
@@ -289,6 +375,15 @@ export default function PortfolioPage() {
             <p className="mt-1 text-[13px] text-muted">
               Add your first position to start tracking performance against a
               target.
+            </p>
+          </div>
+        ) : visiblePositions.length === 0 ? (
+          <div className="mt-6 rounded-xl border border-dashed border-line px-6 py-8 text-center">
+            <p className="text-[14px] font-medium text-ink">
+              No positions match “{trimmedQuery}”
+            </p>
+            <p className="mt-1 text-[13px] text-muted">
+              Use the suggestions above to add a new stock, or clear the search.
             </p>
           </div>
         ) : (
@@ -307,7 +402,7 @@ export default function PortfolioPage() {
                 <span />
               </div>
 
-              {positions.map((position) => {
+              {visiblePositions.map((position) => {
                 const price = livePrice(liveQuotes[position.ticker]);
                 const value = price === undefined ? undefined : price * position.quantity;
                 const gain = value === undefined ? undefined : value - position.costBasis;
@@ -414,7 +509,7 @@ function SummaryTile({
   const up = showTrend ? trend! >= 0 : true;
 
   return (
-    <div className="rounded-2xl border border-line bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+    <div className="rounded-2xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
       <p className="text-[12px] text-muted">{label}</p>
       <p className="mt-2 text-[22px] font-semibold tracking-tight text-ink tabular-nums">
         {value}

@@ -99,7 +99,7 @@ export function StockDetail({ ticker: rawTicker }: { ticker: string }) {
 
   if (profileMissing && !quote) {
     return (
-      <div className="rounded-2xl border border-line bg-white p-10 text-center">
+      <div className="rounded-2xl border border-line bg-surface p-10 text-center">
         <p className="text-[15px] font-medium text-ink">No live data for {ticker}</p>
         <p className="mt-1 text-[13px] text-muted">
           Finnhub returned no profile or quote for this symbol.
@@ -117,7 +117,7 @@ export function StockDetail({ ticker: rawTicker }: { ticker: string }) {
         ← Overview
       </Link>
 
-      <section className="mt-3 rounded-2xl border border-line bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+      <section className="mt-3 rounded-2xl border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
         <div className="flex flex-wrap items-start justify-between gap-5">
           <div className="flex items-center gap-4">
             <StockLogo ticker={ticker} size="size-14" />
@@ -175,10 +175,10 @@ export function StockDetail({ ticker: rawTicker }: { ticker: string }) {
         </dl>
       </section>
 
-      <section className="mt-5 rounded-2xl border border-line bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+      <section className="mt-5 rounded-2xl border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
         <div className="flex items-center justify-between">
           <h2 className="text-[16px] font-semibold text-ink">Price history</h2>
-          <span className="rounded-full bg-[#f8f9fa] px-3 py-1 text-[11.5px] font-medium text-muted">
+          <span className="rounded-full bg-surface-muted px-3 py-1 text-[11.5px] font-medium text-muted">
             5 min candles
           </span>
         </div>
@@ -219,7 +219,7 @@ export function StockDetail({ ticker: rawTicker }: { ticker: string }) {
       </section>
 
       <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-        <section className="rounded-2xl border border-line bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+        <section className="rounded-2xl border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
           <h2 className="text-[16px] font-semibold text-ink">News</h2>
           {news.length === 0 ? (
             <p className="mt-4 text-[13px] text-muted">
@@ -254,7 +254,7 @@ export function StockDetail({ ticker: rawTicker }: { ticker: string }) {
           )}
         </section>
 
-        <section className="rounded-2xl border border-line bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+        <section className="rounded-2xl border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
           <h2 className="text-[16px] font-semibold text-ink">Company</h2>
           <dl className="mt-4 space-y-3">
             <div className="flex items-center justify-between gap-4 text-[13px]">

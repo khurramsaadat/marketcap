@@ -13,6 +13,7 @@ import {
   PlusIcon,
   PortfolioIcon,
 } from "@/components/icons";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const primaryNav = [
   { label: "Overview", href: "/", icon: HomeIcon },
@@ -28,13 +29,13 @@ const fileNav = ["Communication", "Affiliates", "Marketing"];
 const itemClass = (active: boolean) =>
   `flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] transition-colors ${
     active
-      ? "bg-[#f2f3f5] font-medium text-ink"
-      : "text-ink-soft hover:bg-[#f8f9fa]"
+      ? "bg-surface-muted font-medium text-ink"
+      : "text-ink-soft hover:bg-surface-muted"
   }`;
 
 function SoonBadge() {
   return (
-    <span className="ml-auto rounded-full bg-[#f4f5f7] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-faint">
+    <span className="ml-auto rounded-full bg-surface-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-faint">
       Soon
     </span>
   );
@@ -44,7 +45,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-[264px] shrink-0 flex-col border-r border-line bg-white px-5 py-7 lg:flex">
+    <aside className="sticky top-0 hidden h-screen w-[264px] shrink-0 flex-col border-r border-line bg-surface px-5 py-7 lg:flex">
       <Link href="/" className="flex items-center gap-2.5 px-2">
         <LogoMark />
         <span className="text-[19px] font-semibold tracking-tight text-ink">
@@ -111,6 +112,10 @@ export function Sidebar() {
           </span>
         ))}
       </nav>
+
+      <div className="mt-auto px-1 pt-6">
+        <ThemeToggle />
+      </div>
     </aside>
   );
 }

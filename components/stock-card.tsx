@@ -16,7 +16,7 @@ export function StockCard({ ticker, name, price, changePct }: StockCardData) {
   return (
     <Link
       href={`/stocks/${ticker}`}
-      className="block rounded-2xl border border-line bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-shadow hover:shadow-[0_6px_20px_rgba(16,24,40,0.06)]"
+      className="block rounded-2xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-shadow hover:shadow-[0_6px_20px_rgba(16,24,40,0.06)]"
     >
       <div className="flex items-center gap-3">
         <StockLogo ticker={ticker} />

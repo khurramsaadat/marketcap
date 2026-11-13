@@ -23,10 +23,10 @@ export function StatisticsChart({ series }: { series: ValueSnapshot[] }) {
   const labelEvery = Math.max(1, Math.ceil(series.length / 6));
 
   return (
-    <section className="rounded-2xl border border-line bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+    <section className="rounded-2xl border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
       <div className="flex items-start justify-between gap-3">
         <h2 className="text-[16px] font-semibold text-ink">Statistics</h2>
-        <span className="rounded-full bg-[#f8f9fa] px-2.5 py-1 text-[11px] font-medium text-muted">
+        <span className="rounded-full bg-surface-muted px-2.5 py-1 text-[11px] font-medium text-muted">
           Recorded live
         </span>
       </div>

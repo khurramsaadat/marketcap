@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LogoMark } from "@/components/icons";
 import { MobileNav } from "@/components/mobile-nav";
 import { Sidebar } from "@/components/sidebar";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 function MobileHeader() {
   return (
@@ -12,8 +13,11 @@ function MobileHeader() {
           MarketCap
         </span>
       </Link>
-      <div className="flex size-9 items-center justify-center rounded-full bg-[#ece8fd] text-[13px] font-semibold text-accent">
-        MC
+      <div className="flex items-center gap-2">
+        <ThemeToggle variant="icon" />
+        <div className="flex size-9 items-center justify-center rounded-full bg-accent-soft text-[13px] font-semibold text-accent">
+          MC
+        </div>
       </div>
     </header>
   );

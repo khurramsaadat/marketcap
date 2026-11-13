@@ -78,7 +78,7 @@ export function LineChart({
         <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={fillTop} stopOpacity="0.5" />
           <stop offset="65%" stopColor={fillTop} stopOpacity="0.18" />
-          <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+          <stop offset="100%" stopColor="var(--surface)" stopOpacity="0" />
         </linearGradient>
       </defs>
 
@@ -89,7 +89,7 @@ export function LineChart({
             x2={W - PAD.right}
             y1={y(tick)}
             y2={y(tick)}
-            stroke="#eef0f3"
+            stroke="var(--line)"
             strokeWidth="1"
             strokeDasharray="4 7"
           />
@@ -98,7 +98,7 @@ export function LineChart({
             y={y(tick) + 3.5}
             textAnchor="end"
             fontSize="11"
-            fill="#98a2b3"
+            fill="var(--muted)"
           >
             {tickFormat(tick)}
           </text>
@@ -115,7 +115,7 @@ export function LineChart({
             x2={markerPoint.x}
             y1={PAD.top}
             y2={markerPoint.y}
-            stroke="#c9ccd3"
+            stroke="var(--faint)"
             strokeWidth="1"
             strokeDasharray="3 4"
           />
@@ -123,7 +123,7 @@ export function LineChart({
             cx={markerPoint.x}
             cy={markerPoint.y}
             r="3.5"
-            fill="#ffffff"
+            fill="var(--surface)"
             stroke={stroke}
             strokeWidth="2"
           />
@@ -133,14 +133,14 @@ export function LineChart({
             width="50"
             height="22"
             rx="6"
-            fill="#101828"
+            fill="var(--ink)"
           />
           <text
             x={markerPoint.x}
             y={markerPoint.y - 21}
             textAnchor="middle"
             fontSize="11"
-            fill="#ffffff"
+            fill="var(--surface)"
           >
             {marker.label}
           </text>
@@ -155,7 +155,7 @@ export function LineChart({
               y={H - 6}
               textAnchor="middle"
               fontSize="11"
-              fill="#98a2b3"
+              fill="var(--muted)"
             >
               {label}
             </text>
