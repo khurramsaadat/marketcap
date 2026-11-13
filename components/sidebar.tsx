@@ -23,11 +23,7 @@ const primaryNav = [
   { label: "Account", href: null, icon: AccountIcon },
 ];
 
-const fileNav = [
-  { label: "Communication", icon: FolderIcon },
-  { label: "Affiliates", icon: FolderIcon },
-  { label: "Marketing", icon: FolderIcon },
-];
+const fileNav = ["Communication", "Affiliates", "Marketing"];
 
 const itemClass = (active: boolean) =>
   `flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] transition-colors ${
@@ -35,6 +31,14 @@ const itemClass = (active: boolean) =>
       ? "bg-[#f2f3f5] font-medium text-ink"
       : "text-ink-soft hover:bg-[#f8f9fa]"
   }`;
+
+function SoonBadge() {
+  return (
+    <span className="ml-auto rounded-full bg-[#f4f5f7] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-faint">
+      Soon
+    </span>
+  );
+}
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -55,15 +59,26 @@ export function Sidebar() {
 
           if (!href) {
             return (
-              <button key={label} type="button" className={itemClass(false)}>
-                <Icon className="size-[18px] text-faint" />
+              <span
+                key={label}
+                aria-disabled="true"
+                title="Not available yet"
+                className="flex w-full cursor-default items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] text-faint"
+              >
+                <Icon className="size-[18px]" />
                 {label}
-              </button>
+                <SoonBadge />
+              </span>
             );
           }
 
           return (
-            <Link key={label} href={href} className={itemClass(active)}>
+            <Link
+              key={label}
+              href={href}
+              aria-current={active ? "page" : undefined}
+              className={itemClass(active)}
+            >
               <Icon className={`size-[18px] ${active ? "text-ink" : "text-faint"}`} />
               {label}
             </Link>
@@ -73,21 +88,27 @@ export function Sidebar() {
 
       <div className="mt-7 mb-2 flex items-center justify-between px-3">
         <span className="text-[14px] font-medium text-ink">Files</span>
-        <button
-          type="button"
-          aria-label="Add file"
-          className="flex size-6 items-center justify-center rounded-full text-faint transition-colors hover:bg-[#f2f3f5] hover:text-ink-soft"
+        <span
+          aria-disabled="true"
+          title="Not available yet"
+          className="flex size-6 items-center justify-center rounded-full text-faint"
         >
           <PlusIcon />
-        </button>
+        </span>
       </div>
 
       <nav className="space-y-1">
-        {fileNav.map(({ label, icon: Icon }) => (
-          <button key={label} type="button" className={itemClass(false)}>
-            <Icon className="size-[18px] text-faint" />
+        {fileNav.map((label) => (
+          <span
+            key={label}
+            aria-disabled="true"
+            title="Not available yet"
+            className="flex w-full cursor-default items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] text-faint"
+          >
+            <FolderIcon className="size-[18px]" />
             {label}
-          </button>
+            <SoonBadge />
+          </span>
         ))}
       </nav>
     </aside>

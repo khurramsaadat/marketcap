@@ -11,7 +11,9 @@ type StockParams = { ticker: string };
 
 async function StockContent({ params }: { params: Promise<StockParams> }) {
   const { ticker } = await params;
-  return <StockDetail ticker={ticker} />;
+  // Keyed so switching symbols resets fetched profile/news instead of briefly
+  // showing the previous company's data.
+  return <StockDetail key={ticker.toUpperCase()} ticker={ticker} />;
 }
 
 function StockFallback() {

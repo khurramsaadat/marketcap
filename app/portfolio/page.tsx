@@ -20,7 +20,10 @@ function livePrice(live?: LiveQuote) {
 }
 
 function formatDate(value: string) {
-  return new Date(`${value}T00:00:00`).toLocaleDateString("en-US", {
+  if (!value) return "—";
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return "—";
+  return date.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -40,6 +43,7 @@ export default function PortfolioPage() {
     positions.map((position) => position.ticker),
   );
   const [formOpen, setFormOpen] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [draft, setDraft] = useState({
     ticker: "",
     quantity: "",
@@ -72,8 +76,20 @@ export default function PortfolioPage() {
     const ticker = draft.ticker.trim().toUpperCase();
     const quantity = Number(draft.quantity);
     const costBasis = Number(draft.costBasis);
-    if (!ticker || !Number.isFinite(quantity) || quantity <= 0) return;
-    if (!Number.isFinite(costBasis) || costBasis < 0) return;
+
+    if (!ticker) {
+      setFormError("Enter a ticker symbol.");
+      return;
+    }
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      setFormError("Quantity must be greater than zero.");
+      return;
+    }
+    if (!Number.isFinite(costBasis) || costBasis < 0) {
+      setFormError("Cost basis must be zero or more.");
+      return;
+    }
+    setFormError(null);
 
     setPositions((current) => [
       ...current,
@@ -232,6 +248,12 @@ export default function PortfolioPage() {
               />
             </div>
           </div>
+          {formError ? (
+            <p className="mt-3 text-[12px] text-down" role="alert">
+              {formError}
+            </p>
+          ) : null}
+
           <div className="mt-5 flex items-center gap-2.5">
             <button
               type="submit"
@@ -251,7 +273,15 @@ export default function PortfolioPage() {
       ) : null}
 
       <section className="mt-5 rounded-2xl border border-line bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
-        <h2 className="text-[16px] font-semibold text-ink">My Stock</h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-[16px] font-semibold text-ink">My Stock</h2>
+          {positions.length > 0 &&
+          positions.some((p) => livePrice(liveQuotes[p.ticker]) === undefined) ? (
+            <span className="text-[11.5px] text-faint">
+              Some positions have no live quote yet
+            </span>
+          ) : null}
+        </div>
 
         {positions.length === 0 ? (
           <div className="mt-6 rounded-xl border border-dashed border-line px-6 py-10 text-center">

@@ -13,6 +13,9 @@ export type LiveQuote = {
 };
 
 const POLL_MS = 60_000;
+const BATCH_SIZE = 12;
+
+type QuotesResponse = { quotes?: Record<string, LiveQuote> };
 
 export function useLiveQuotes(tickers: string[]) {
   const key = tickers
@@ -28,20 +31,33 @@ export function useLiveQuotes(tickers: string[]) {
     if (!key) return;
     let active = true;
 
+    const list = key.split(",").filter(Boolean);
+    const batches: string[][] = [];
+    for (let index = 0; index < list.length; index += BATCH_SIZE) {
+      batches.push(list.slice(index, index + BATCH_SIZE));
+    }
+
     const load = async () => {
       try {
-        const response = await fetch(
-          `/api/quotes?tickers=${encodeURIComponent(key)}`,
-          { cache: "no-store" },
+        const responses = await Promise.all(
+          batches.map((batch) =>
+            fetch(`/api/quotes?tickers=${encodeURIComponent(batch.join(","))}`, {
+              cache: "no-store",
+            })
+              .then((response) => (response.ok ? (response.json() as Promise<QuotesResponse>) : null))
+              .catch(() => null),
+          ),
         );
-        if (!response.ok) return;
 
-        const data = (await response.json()) as {
-          quotes?: Record<string, LiveQuote>;
-        };
-        if (!active || !data.quotes) return;
+        if (!active) return;
 
-        setQuotes((current) => ({ ...current, ...data.quotes }));
+        const merged: Record<string, LiveQuote> = {};
+        for (const data of responses) {
+          if (data?.quotes) Object.assign(merged, data.quotes);
+        }
+        if (Object.keys(merged).length === 0) return;
+
+        setQuotes((current) => ({ ...current, ...merged }));
         setUpdatedAt(Date.now());
       } catch {
         // keep the last known prices when the network is unavailable

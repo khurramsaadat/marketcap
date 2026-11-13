@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PortfolioValues } from "@/components/portfolio-values";
 import { StatisticsChart } from "@/components/statistics-chart";
 import { StockCard } from "@/components/stock-card";
@@ -13,9 +13,13 @@ import { recordValue, useValueHistory } from "@/lib/use-value-history";
 
 const MARKET_WATCH = ["AAPL", "MSFT", "NVDA", "AMZN"];
 
+export type SortMode = "none" | "top" | "worst";
+
 function formatDate(value: string) {
   if (!value) return "—";
-  return new Date(`${value}T00:00:00`).toLocaleDateString("en-US", {
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return "—";
+  return date.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -30,38 +34,67 @@ export function DashboardLive() {
   );
   const { quotes } = useLiveQuotes(tickers);
   const history = useValueHistory();
+  const [sortMode, setSortMode] = useState<SortMode>("none");
 
   const totals = useMemo(() => {
-    const invested = positions.reduce((sum, p) => sum + p.costBasis, 0);
-    const value = positions.reduce(
-      (sum, p) => sum + (quotes[p.ticker]?.price ?? 0) * p.quantity,
-      0,
-    );
+    let invested = 0;
+    let value = 0;
+    let pricedCount = 0;
+
+    for (const position of positions) {
+      const price = quotes[position.ticker]?.price;
+      // A position without a quote is excluded from both sides of the maths so a
+      // pending fetch never reads as a total loss.
+      if (price === undefined) continue;
+      invested += position.costBasis;
+      value += price * position.quantity;
+      pricedCount += 1;
+    }
+
     return {
       invested,
       value,
+      pricedCount,
       gain: value - invested,
       gainPct: invested > 0 ? ((value - invested) / invested) * 100 : 0,
     };
   }, [positions, quotes]);
 
   useEffect(() => {
-    if (positions.length > 0) recordValue(totals.value);
-  }, [positions.length, totals.value]);
+    const allPriced = positions.length > 0 && totals.pricedCount === positions.length;
+    if (allPriced) recordValue(totals.value);
+  }, [positions.length, totals.pricedCount, totals.value]);
 
   const rows: StockRowData[] = positions.map((position) => {
     const price = quotes[position.ticker]?.price;
-    const value = (price ?? 0) * position.quantity;
+    const value = price === undefined ? undefined : price * position.quantity;
+    const changePct =
+      value === undefined
+        ? undefined
+        : position.costBasis > 0
+          ? ((value - position.costBasis) / position.costBasis) * 100
+          : 0;
+
     return {
+      id: position.id,
       ticker: position.ticker,
-      name: findQuote(position.ticker)?.name ?? "Tracked position",
+      name: findQuote(position.ticker)?.name ?? position.ticker,
       investDate: formatDate(position.purchaseDate),
       quantity: position.quantity,
-      changePct:
-        position.costBasis > 0 ? ((value - position.costBasis) / position.costBasis) * 100 : 0,
+      changePct,
       price,
     };
   });
+
+  const sortedRows = useMemo(() => {
+    if (sortMode === "none") return rows;
+    const direction = sortMode === "top" ? -1 : 1;
+    return [...rows].sort((a, b) => {
+      if (a.changePct === undefined) return 1;
+      if (b.changePct === undefined) return -1;
+      return (a.changePct - b.changePct) * direction;
+    });
+  }, [rows, sortMode]);
 
   return (
     <>
@@ -90,12 +123,15 @@ export function DashboardLive() {
           gain={totals.gain}
           gainPct={totals.gainPct}
           positions={positions.length}
+          pricedCount={totals.pricedCount}
+          sortMode={sortMode}
+          onSort={setSortMode}
         />
         <StatisticsChart series={history} />
       </div>
 
       <div className="mt-5">
-        <StockTable rows={rows} />
+        <StockTable rows={sortedRows} />
       </div>
     </>
   );

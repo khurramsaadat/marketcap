@@ -14,17 +14,31 @@ export default function WatchlistPage() {
   const [tickers, setTickers] = useLocalStore<string>(WATCHLIST_KEY, seedWatchlist);
   const { quotes: liveQuotes } = useLiveQuotes(tickers);
   const [draft, setDraft] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
 
   const addTicker = (event: FormEvent) => {
     event.preventDefault();
     const ticker = draft.trim().toUpperCase();
     if (!ticker) return;
-    if (!tickers.includes(ticker)) setTickers([...tickers, ticker]);
+
+    if (!/^[A-Z][A-Z.-]{0,9}$/.test(ticker)) {
+      setMessage("Use a ticker symbol such as AAPL or BRK.B.");
+      return;
+    }
+    if (tickers.includes(ticker)) {
+      setMessage(`${ticker} is already on your watchlist.`);
+      setDraft("");
+      return;
+    }
+
+    setTickers([...tickers, ticker]);
+    setMessage(`${ticker} added to your watchlist.`);
     setDraft("");
   };
 
   const remove = (ticker: string) => {
     setTickers(tickers.filter((item) => item !== ticker));
+    setMessage(`${ticker} removed from your watchlist.`);
   };
 
   return (
@@ -64,6 +78,12 @@ export default function WatchlistPage() {
         </form>
       </div>
 
+      {message ? (
+        <p className="mt-2 text-[12px] text-muted" role="status">
+          {message}
+        </p>
+      ) : null}
+
       <section className="mt-5 rounded-2xl border border-line bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
         <h2 className="text-[16px] font-semibold text-ink">Watchlist</h2>
 
@@ -89,7 +109,7 @@ export default function WatchlistPage() {
                   className="flex flex-wrap items-center gap-4 py-3.5"
                 >
                   <Link
-                    href={quote ? `/stocks/${ticker}` : "#"}
+                    href={`/stocks/${ticker}`}
                     className="flex min-w-0 flex-1 items-center gap-3"
                   >
                     <StockLogo ticker={ticker} size="size-9" />
@@ -98,7 +118,7 @@ export default function WatchlistPage() {
                         {ticker}
                       </span>
                       <span className="block truncate text-[12px] text-muted">
-                        {quote?.name ?? "Quote unavailable"}
+                        {quote?.name ?? "Open quote"}
                       </span>
                     </span>
                   </Link>

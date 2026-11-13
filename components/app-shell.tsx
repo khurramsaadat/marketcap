@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { LogoMark } from "@/components/icons";
+import { MobileNav } from "@/components/mobile-nav";
 import { Sidebar } from "@/components/sidebar";
 
 function MobileHeader() {
   return (
-    <header className="mb-5 flex items-center justify-between lg:hidden">
+    <header className="mb-4 flex items-center justify-between lg:hidden">
       <Link href="/" className="flex items-center gap-2.5">
         <LogoMark className="size-8" />
         <span className="text-[17px] font-semibold tracking-tight text-ink">
@@ -24,6 +25,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <Sidebar />
       <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-7">
         <MobileHeader />
+        <MobileNav />
         {children}
       </main>
     </div>

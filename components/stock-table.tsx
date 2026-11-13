@@ -3,11 +3,12 @@ import { ChangeArrow, SortIcon, StockLogo } from "@/components/icons";
 import { formatCurrency, formatPercent } from "@/lib/dashboard-data";
 
 export type StockRowData = {
+  id: string;
   ticker: string;
   name: string;
   investDate: string;
   quantity: number;
-  changePct: number;
+  changePct?: number;
   price?: number;
 };
 
@@ -23,7 +24,8 @@ const gridCols =
   "grid-cols-[minmax(190px,1.5fr)_minmax(120px,0.9fr)_minmax(90px,0.6fr)_minmax(110px,0.7fr)_minmax(110px,0.7fr)]";
 
 function Row({ row }: { row: StockRowData }) {
-  const up = row.changePct >= 0;
+  const hasChange = typeof row.changePct === "number";
+  const up = (row.changePct ?? 0) >= 0;
 
   return (
     <div className={`grid ${gridCols} items-center gap-3 border-t border-line px-1 py-3.5`}>
@@ -39,14 +41,18 @@ function Row({ row }: { row: StockRowData }) {
       <p className="text-[13.5px] text-ink-soft">{row.investDate}</p>
       <p className="text-[13.5px] text-ink-soft tabular-nums">{row.quantity}</p>
       <div>
-        <span
-          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-medium ${
-            up ? "bg-up-soft text-up" : "bg-down-soft text-down"
-          }`}
-        >
-          <ChangeArrow up={up} className="size-3" />
-          {formatPercent(row.changePct)}
-        </span>
+        {hasChange ? (
+          <span
+            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-medium ${
+              up ? "bg-up-soft text-up" : "bg-down-soft text-down"
+            }`}
+          >
+            <ChangeArrow up={up} className="size-3" />
+            {formatPercent(row.changePct as number)}
+          </span>
+        ) : (
+          <span className="text-[12px] text-faint">No quote</span>
+        )}
       </div>
       <p className="text-right text-[13.5px] font-semibold text-ink tabular-nums">
         {typeof row.price === "number" ? formatCurrency(row.price) : "—"}
@@ -76,21 +82,20 @@ export function StockTable({ rows }: { rows: StockRowData[] }) {
           <div className="min-w-[680px]">
             <div className={`grid ${gridCols} items-center gap-3 px-1 pb-1`}>
               {columns.map((column) => (
-                <button
+                <span
                   key={column.label}
-                  type="button"
-                  className={`flex items-center gap-1.5 text-[13px] font-medium text-muted transition-colors hover:text-ink-soft ${
+                  className={`flex items-center gap-1.5 text-[13px] font-medium text-muted ${
                     column.align === "right" ? "justify-end" : "justify-start"
                   }`}
                 >
                   {column.label}
-                  <SortIcon />
-                </button>
+                  <SortIcon className="size-3 text-faint" />
+                </span>
               ))}
             </div>
 
             {rows.map((row) => (
-              <Row key={`${row.ticker}-${row.investDate}`} row={row} />
+              <Row key={row.id} row={row} />
             ))}
           </div>
         </div>
