@@ -116,8 +116,8 @@ deploy predates it.
 ## 8. Git workflow
 
 - Conventional-ish short subjects, one logical change per commit.
-- Do not commit `.env.local`, `.dev.log` or review screenshots (`*.png` at the repo root are
-  intentionally untracked).
+- Do not commit `.env.local`, `.dev.log` or review screenshots. Snapshots live in `screenshots/`
+  (`light/` and `dark/`) and are git-ignored — they are reference material, not app assets.
 - Run `npm run lint && npm run build` before pushing.
 
 ## 9. Troubleshooting

@@ -24,6 +24,10 @@
 .DS_Store
 *.pem
 
+# local review screenshots — reference only, never committed
+/screenshots/
+/*.png
+
 # debug
 npm-debug.log*
 yarn-debug.log*

@@ -168,8 +168,8 @@ curl "localhost:4310/api/search?q=apple"
 4. `cacheComponents` in Next 16 rejects `dynamic`/`dynamicParams` route configs and client hooks
    outside Suspense, so the stock route reads `params` inside a `<Suspense>` boundary and passes the
    ticker to a client component.
-5. Screenshots generated during review (`*-preview.png`, `dashboard.png`) are intentionally
-   untracked.
+5. Review screenshots are kept in `screenshots/light/` and `screenshots/dark/`, which is git-ignored
+   by design — they are reference material, not part of the build.
 
 ## Changelog
 
