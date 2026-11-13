@@ -79,8 +79,8 @@ export default function WatchlistPage() {
             {tickers.map((ticker) => {
               const quote = findQuote(ticker);
               const live = liveQuotes[ticker];
-              const price = live?.price ?? quote?.price;
-              const changePct = live?.changePct ?? quote?.changePct;
+              const price = live?.price;
+              const changePct = live?.changePct;
               const up = (changePct ?? 0) >= 0;
 
               return (

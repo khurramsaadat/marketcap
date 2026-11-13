@@ -4,10 +4,22 @@ import {
   KebabIcon,
   SparkleIcon,
 } from "@/components/icons";
-import { formatCurrency, formatPercent, portfolioSummary } from "@/lib/dashboard-data";
+import { formatCurrency, formatPercent } from "@/lib/dashboard-data";
 
-export function PortfolioValues() {
-  const up = portfolioSummary.changePct >= 0;
+type PortfolioValuesProps = {
+  total: number;
+  gain: number;
+  gainPct: number;
+  positions: number;
+};
+
+export function PortfolioValues({
+  total,
+  gain,
+  gainPct,
+  positions,
+}: PortfolioValuesProps) {
+  const up = gain >= 0;
 
   return (
     <section className="flex flex-col rounded-2xl border border-line bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
@@ -24,17 +36,26 @@ export function PortfolioValues() {
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <p className="text-[34px] font-semibold leading-none tracking-tight text-ink tabular-nums">
-          {formatCurrency(portfolioSummary.total)}
+          {formatCurrency(total)}
         </p>
-        <span className="inline-flex items-center gap-1 rounded-full bg-up-soft px-2.5 py-1 text-[12px] font-medium text-up">
-          <ChangeArrow up={up} className="size-3" />
-          {formatPercent(portfolioSummary.changePct)}
-        </span>
+        {positions > 0 ? (
+          <span
+            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-medium ${
+              up ? "bg-up-soft text-up" : "bg-down-soft text-down"
+            }`}
+          >
+            <ChangeArrow up={up} className="size-3" />
+            {formatPercent(gainPct)}
+          </span>
+        ) : null}
       </div>
 
-      <p className="mt-4 max-w-[300px] text-[13px] leading-relaxed text-muted">
-        You profits is {formatCurrency(portfolioSummary.profit)} in this months.
-        that&apos;s the best result in the last three months.
+      <p className="mt-4 max-w-[320px] text-[13px] leading-relaxed text-muted">
+        {positions > 0
+          ? `You're ${up ? "up" : "down"} ${formatCurrency(Math.abs(gain))} across ${positions} ${
+              positions === 1 ? "position" : "positions"
+            }, priced live from Finnhub.`
+          : "Add a position to track its value and gain against cost basis using live prices."}
       </p>
 
       <div className="mt-5 flex flex-wrap items-center gap-2.5">

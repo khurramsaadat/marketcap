@@ -105,10 +105,12 @@ Blocked on: the Supabase project being created (URL, anon key, service-role key)
 
 - [x] Portfolio fields: quantity, total cost basis, purchase date, target price
 - [x] Auto gain/loss from live price; target-hit badge
+- [x] Stock page uses live quote + `/api/profile` metrics + `/api/news` headlines
+- [x] Live price polling on the stock detail page (60s via `useLiveQuotes`)
+- [x] Removed every invented market figure (see `DATA.md` → “Mock data that was removed”)
+- [x] Dashboard portfolio value, gain/loss and table computed from your positions + live quotes
 - [ ] Top movers (gainers/losers) on the home page — needs a fixed watch universe on the free tier
 - [ ] General market news feed card on the dashboard (route already exists)
-- [ ] Per-stock news on the stock page from `/api/news?symbol=…` (currently catalogue copy)
-- [ ] Live price polling on the stock detail page
 - [ ] Search UI in the sidebar/header using `/api/search`
 - [ ] Brand marks for the remaining tickers (NVDA, MSFT, AMZN, TSLA, …) instead of initials
 
@@ -142,6 +144,7 @@ app/
 components/               sidebar, app-shell, cards, table, charts, icons, actions
 lib/                      dashboard-data, market-data, stores, hooks, polling
 PRD.md Plan.md input.md   requirements, roadmap, captured inputs
+DATA.md README.md         data provenance and project overview
 ```
 
 ## How to verify
@@ -160,9 +163,11 @@ curl "localhost:4310/api/search?q=apple"
 1. Prices are polled every 60s; no websocket/streaming feed (per the brief).
 2. Portfolio and watchlist persist in `localStorage` until Supabase auth lands — they are not yet
    per-user or cross-device.
-3. The stock detail page renders catalogue prices; polling there is a pending item.
-4. `cacheComponents` in Next 16 rejects `dynamic`/`dynamicParams` route configs, so the stock route
-   uses `generateStaticParams()` instead.
+3. Finnhub's free plan blocks `/stock/candle`, so the stock page shows a “not included in the free
+   plan” notice instead of a price chart. No synthetic series is drawn.
+4. `cacheComponents` in Next 16 rejects `dynamic`/`dynamicParams` route configs and client hooks
+   outside Suspense, so the stock route reads `params` inside a `<Suspense>` boundary and passes the
+   ticker to a client component.
 5. Screenshots generated during review (`*-preview.png`, `dashboard.png`) are intentionally
    untracked.
 
@@ -171,3 +176,6 @@ curl "localhost:4310/api/search?q=apple"
 - **2026-11-13** — Repo created and pushed (`https://github.com/khurramsaadat/marketcap.git`);
   dashboard, app shell, watchlist, portfolio, stock detail and live Finnhub integration shipped;
   `PRD.md`, `Plan.md`, `input.md` added.
+- **2026-11-13** — Removed all mock market data. Added `/api/profile` and `/api/candles`, moved the
+  stock page and dashboard onto live sources, made the statistics chart plot only recorded live
+  observations, and documented provenance in `DATA.md`.

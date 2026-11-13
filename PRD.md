@@ -2,7 +2,7 @@
 
 **Status:** Front end and live market data are built; Supabase auth/RLS and deployment remain.
 **Last updated:** 2026-11-13
-**Inputs:** see `input.md` · **Roadmap:** see `Plan.md`
+**Inputs:** see `input.md` · **Roadmap:** see `Plan.md` · **Data provenance:** see `DATA.md`
 
 ---
 
@@ -12,9 +12,10 @@ MarketCap is a stock investment dashboard: search quotes, follow a watchlist, tr
 against cost basis and target prices, and read market news — modelled on Google Finance and the
 `ref.jpg` dashboard design.
 
-**Current state:** a working Next.js app with a routed shell, four pages, live Finnhub quotes/news
-polled every 60 seconds, and browser-local portfolio/watchlist storage. Authentication, per-user
-database rows and hosting are not wired yet.
+**Current state:** a working Next.js app with a routed shell, four pages, live Finnhub quotes,
+company profiles, metrics and news polled every 60 seconds, and browser-local portfolio/watchlist
+storage. Authentication, per-user database rows and hosting are not wired yet. No invented market
+data is displayed anywhere — see `DATA.md`.
 
 ## 2. Goals
 
@@ -46,7 +47,7 @@ Legend: ✅ done · 🟡 partial · ⬜ not started
 |----|-------------|---------------------|--------|
 | F1 | Dashboard matches the reference design | Sidebar, four holding cards, Portfolio Values + Statistics row, My Stock table, light lavender-washed surface | ✅ |
 | F2 | Routed app shell | Sidebar links to `/`, `/watchlist`, `/portfolio`; active item highlighted; mobile header on small screens | ✅ |
-| F3 | Live quotes | Prices and change % for up to 12 tickers per request, sourced from Finnhub via a server route; graceful fallback to the catalogue when the key is absent | ✅ |
+| F3 | Live quotes | Prices and change % for up to 12 tickers per request, sourced from Finnhub via a server route; when the key is absent the UI shows “—” rather than invented prices | ✅ |
 | F4 | 60-second polling | Dashboard cards, watchlist and portfolio refresh every 60s and keep last-known values on failure | ✅ |
 | F5 | Watchlist | Add ticker (datalist suggestions), remove, live price + change, link to stock page | ✅ 🟡 local storage only |
 | F6 | Portfolio | Add position (ticker, quantity, **total** cost basis, purchase date, optional target); value, gain/loss % and target-hit computed from the live price | ✅ 🟡 local storage only |
@@ -54,13 +55,14 @@ Legend: ✅ done · 🟡 partial · ⬜ not started
 | F8 | Per-stock news | Headlines for the selected ticker from Finnhub company-news | 🟡 API ready, stock page still renders catalogue news |
 | F9 | General market news | Market feed on the dashboard | 🟡 API ready, dashboard not wired |
 | F10 | Top movers | Gainers/losers section on the home page | ⬜ |
-| F11 | Stock detail page | Price, change, market cap, P/E, day/52-week ranges, chart, news, about; add to watchlist/portfolio | 🟡 page built, price is catalogue-derived |
+| F11 | Stock detail page | Live price, day range, previous close, market cap, P/E, beta, dividend yield, 52-week range, company profile and real headlines; add to watchlist/portfolio | ✅ chart shows a plan notice when candles are blocked |
 | F12 | Search | Ticker/company search from the header | 🟡 `/api/search` ready, no UI |
 | F13 | Auth (email/password) | Sign up, sign in, sign out, session-aware header | ⬜ |
 | F14 | Auth (Google) | OAuth sign-in through Supabase | ⬜ |
 | F15 | Row-level security | Every user-owned table readable/writable only by `auth.uid() = user_id` | ⬜ |
 | F16 | Per-user persistence | Watchlist and portfolio survive sign-out/sign-in across devices | ⬜ |
 | F17 | Deployment | Published on Freebuff Sites with `FINNHUB_API_KEY` in Secrets | ⬜ |
+| F18 | No invented market data | Every displayed figure is live, user-entered or derived from a live value; unavailable data shows an explicit notice | ✅ |
 
 ## 6. Data model (Supabase Postgres — planned)
 
@@ -163,5 +165,11 @@ All responses are `cache-control: no-store`; missing key returns an empty result
 2. **Google OAuth** requires redirect URLs registered for both localhost and the deployed origin.
 3. **Top movers** needs a symbol universe; Finnhub's free tier has no screener, so this will use a
    fixed watch universe unless a different endpoint is available.
-4. **News on the stock page** is still catalogue copy — wiring the Finnhub news route is a small,
-   pending change.
+4. **Intraday candles** are plan-restricted on Finnhub's free tier, so the stock page shows a notice
+   instead of a chart. A paid plan or a different provider is required to plot price history.
+
+## 12. Data provenance
+
+`DATA.md` lists every field on screen and whether it is live (Finnhub), user-entered, derived from
+live values, static reference data, or unavailable on the current plan. It also records the mock
+data that was removed when the app moved to live sources.

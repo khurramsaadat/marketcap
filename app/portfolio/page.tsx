@@ -15,11 +15,8 @@ const gridCols =
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-function priceOf(position: Position, live?: LiveQuote) {
-  if (live && live.price > 0) return live.price;
-  const quote = findQuote(position.ticker);
-  if (quote) return quote.price;
-  return position.quantity > 0 ? position.costBasis / position.quantity : 0;
+function livePrice(live?: LiveQuote) {
+  return live && live.price > 0 ? live.price : undefined;
 }
 
 function formatDate(value: string) {
@@ -52,11 +49,16 @@ export default function PortfolioPage() {
   });
 
   const totals = useMemo(() => {
-    const invested = positions.reduce((sum, p) => sum + p.costBasis, 0);
-    const value = positions.reduce(
-      (sum, p) => sum + priceOf(p, liveQuotes[p.ticker]) * p.quantity,
-      0,
-    );
+    let invested = 0;
+    let value = 0;
+
+    for (const position of positions) {
+      const price = livePrice(liveQuotes[position.ticker]);
+      if (price === undefined) continue;
+      invested += position.costBasis;
+      value += price * position.quantity;
+    }
+
     return {
       invested,
       value,
@@ -276,14 +278,18 @@ export default function PortfolioPage() {
               </div>
 
               {positions.map((position) => {
-                const price = priceOf(position, liveQuotes[position.ticker]);
-                const value = price * position.quantity;
-                const gain = value - position.costBasis;
+                const price = livePrice(liveQuotes[position.ticker]);
+                const value = price === undefined ? undefined : price * position.quantity;
+                const gain = value === undefined ? undefined : value - position.costBasis;
                 const gainPct =
-                  position.costBasis > 0 ? (gain / position.costBasis) * 100 : 0;
-                const up = gain >= 0;
+                  gain !== undefined && position.costBasis > 0
+                    ? (gain / position.costBasis) * 100
+                    : 0;
+                const up = (gain ?? 0) >= 0;
                 const targetHit =
-                  position.targetPrice !== null && price >= position.targetPrice;
+                  price !== undefined &&
+                  position.targetPrice !== null &&
+                  price >= position.targetPrice;
 
                 return (
                   <div
@@ -330,16 +336,20 @@ export default function PortfolioPage() {
                       )}
                     </span>
                     <span className="text-[13.5px] font-semibold text-ink tabular-nums">
-                      {formatCurrency(value)}
+                      {value === undefined ? "—" : formatCurrency(value)}
                     </span>
-                    <span
-                      className={`inline-flex w-fit items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-medium ${
-                        up ? "bg-up-soft text-up" : "bg-down-soft text-down"
-                      }`}
-                    >
-                      <ChangeArrow up={up} className="size-3" />
-                      {formatPercent(gainPct)}
-                    </span>
+                    {gain === undefined ? (
+                      <span className="text-[12px] text-faint">No quote</span>
+                    ) : (
+                      <span
+                        className={`inline-flex w-fit items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-medium ${
+                          up ? "bg-up-soft text-up" : "bg-down-soft text-down"
+                        }`}
+                      >
+                        <ChangeArrow up={up} className="size-3" />
+                        {formatPercent(gainPct)}
+                      </span>
+                    )}
                     <button
                       type="button"
                       onClick={() => removePosition(position.id)}
