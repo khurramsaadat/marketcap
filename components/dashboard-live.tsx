@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { CryptoAlert } from "@/components/crypto-alert";
 import { PortfolioValues } from "@/components/portfolio-values";
 import { StatisticsChart } from "@/components/statistics-chart";
 import { StockCard } from "@/components/stock-card";
@@ -118,6 +119,10 @@ export function DashboardLive() {
             />
           );
         })}
+      </div>
+
+      <div className="mt-5">
+        <CryptoAlert />
       </div>
 
       <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">

@@ -30,6 +30,7 @@
 
 # debug
 npm-debug.log*
+scripts/price_alert_log.csv
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
